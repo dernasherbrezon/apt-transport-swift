@@ -13,9 +13,9 @@ SRCEXT      := cc
 OBJEXT      := o
 
 #Flags, Libraries and Includes
-CFLAGS      := -Wall -O3 -g
+CFLAGS      := -Wall -O3 -g -std=c++11
 LIB         := -lcurl #-lapt-pkg -lapt-inst
-INC         := -I$(INCDIR)
+INC         := -I$(INCDIR) -I"/Users/dernasherbrezon/apt-includes"
 INCDEP      := -I$(INCDIR)
 
 #---------------------------------------------------------------------------------
