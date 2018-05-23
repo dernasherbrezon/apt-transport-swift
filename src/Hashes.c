@@ -7,17 +7,17 @@
 #include "Hashes.h"
 
 char* swift_convertToHexString(unsigned char* str, int arraySize) {
-	char* result = malloc(sizeof(char) * (arraySize + 1));
+	char* result = malloc(sizeof(char) * (arraySize * 2 + 1));
 	for (int i = 0; i < arraySize; i++) {
-		sprintf(result, "%02x", str[i]);
+		sprintf(&result[i * 2], "%02x", str[i]);
 	}
-	result[arraySize] = '\0';
+	result[arraySize * 2] = '\0';
 	return result;
 }
 
 struct Hashes* swift_hash_file(struct URIAcquire* req, FILE* file) {
 	struct Hashes* result = malloc(sizeof(struct Hashes));
-	if( result == NULL ) {
+	if (result == NULL) {
 		return NULL;
 	}
 	MD5_CTX mdContext;
@@ -90,6 +90,4 @@ struct Hashes* swift_hash_file(struct URIAcquire* req, FILE* file) {
 	}
 	return result;
 }
-
-
 

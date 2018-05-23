@@ -73,15 +73,7 @@ static size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream) {
 
 int main(void) {
 
-	CURL *curl;
-	CURLcode res;
-
-	curl_global_init(CURL_GLOBAL_DEFAULT);
-
-	curl = curl_easy_init();
-	if (!curl) {
-		return EXIT_FAILURE;
-	}
+	CURL *curl = NULL;
 
 	swift_requestCapabilities();
 
@@ -100,6 +92,14 @@ int main(void) {
 			if (message == NULL) {
 				continue;
 			}
+			if (curl == NULL) {
+				curl_global_init(CURL_GLOBAL_DEFAULT);
+				curl = curl_easy_init();
+				if (!curl) {
+					break;
+				}
+			}
+
 			curl_easy_setopt(curl, CURLOPT_URL, message->uri);
 			curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
 			curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
@@ -109,7 +109,7 @@ int main(void) {
 				continue;
 			}
 			curl_easy_setopt(curl, CURLOPT_WRITEDATA, pagefile);
-			res = curl_easy_perform(curl);
+			CURLcode res = curl_easy_perform(curl);
 			fclose(pagefile);
 			if (res != CURLE_OK) {
 				swift_responseError(message->uri, curl_easy_strerror(res));
