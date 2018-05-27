@@ -17,6 +17,25 @@ START_TEST (test_substring) {
 }
 END_TEST
 
+void assertTrim(const char *str, const char* expected) {
+	char *mutable = (char*) malloc(strlen(str));
+	ck_assert_str_eq(trim(strcpy(mutable, str)), expected);
+	free(mutable);
+}
+
+START_TEST (test_trim) {
+	assertTrim("nothing to trim", "nothing to trim");
+	assertTrim("    trim the front", "trim the front");
+	assertTrim("trim the back     ", "trim the back");
+	assertTrim(" trim one char front and back ", "trim one char front and back");
+	assertTrim("                   ", "");
+	assertTrim(" ", "");
+	assertTrim("a", "a");
+	assertTrim("\0", "");
+	ck_assert(trim(NULL) == NULL);
+}
+END_TEST
+
 Suite * common_suite(void) {
 	Suite *s;
 	TCase *tc_core;
@@ -29,6 +48,7 @@ Suite * common_suite(void) {
 	tcase_add_test(tc_core, test_cutPrefix);
 	tcase_add_test(tc_core, test_startsWith);
 	tcase_add_test(tc_core, test_substring);
+	tcase_add_test(tc_core, test_trim);
 	suite_add_tcase(s, tc_core);
 
 	return s;

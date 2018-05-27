@@ -10,4 +10,6 @@ char* substring(const char *str, size_t index);
 
 char* cutPrefix(const char* str, const char* prefix);
 
+char *trim(char *str);
+
 #endif /* COMMON_H_ */
