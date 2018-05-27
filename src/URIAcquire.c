@@ -2,15 +2,17 @@
 #include <stdlib.h>
 
 #include "URIAcquire.h"
+#include "common.h"
 
 struct URIAcquire* swift_uri_acquire_read() {
 	char *line = NULL;
 	size_t len = 0;
 	ssize_t readBytes;
 	struct URIAcquire* result = malloc(sizeof(struct URIAcquire));
-	if(result == NULL) {
+	if (result == NULL) {
 		return NULL;
 	}
+	result->lastModified = NULL;
 	result->expectedMd5 = false;
 	result->expectedSha1 = false;
 	result->expectedSha256 = false;
@@ -32,6 +34,8 @@ struct URIAcquire* swift_uri_acquire_read() {
 			result->expectedSha256 = true;
 		} else if (startsWith(line, "Expected-SHA512")) {
 			result->expectedSha512 = true;
+		} else if (startsWith(line, "Last-Modified")) {
+			result->lastModified = substring(line, 13);
 		}
 	}
 	if (result->uri == NULL) {

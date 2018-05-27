@@ -6,6 +6,13 @@ bool startsWith(const char *str, const char *pre) {
 	return strncmp(pre, str, strlen(pre)) == 0;
 }
 
+char* cutPrefix(const char* str, const char* prefix) {
+	if (!startsWith(str, prefix)) {
+		return NULL;
+	}
+	return substring(str, strlen(prefix));
+}
+
 char* substring(const char *str, size_t index) {
 	size_t resultSize = strlen(str) - index;
 	char* result = (char*) malloc(resultSize);

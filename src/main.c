@@ -14,8 +14,10 @@
 #include <stdbool.h>
 #include <curl/curl.h>
 
+#include "common.h"
 #include "Hashes.h"
 #include "URIAcquire.h"
+#include "Configuration.h"
 
 void swift_requestCapabilities() {
 	fprintf(stdout, "100 Capabilities\n");
@@ -81,15 +83,21 @@ int main(void) {
 	size_t len = 0;
 	ssize_t readBytes;
 
+	struct Configuration *configuration = NULL;
+
 	while (true) {
 		if ((readBytes = getline(&line, &len, stdin)) == -1) {
 			break;
 		}
 		if (startsWith(line, "601")) {
+			configuration = swift_configuration_read();
+			if (configuration == NULL) {
+				continue;
+			}
 			//FIXME handle configuration
 		} else if (startsWith(line, "600")) {
 			struct URIAcquire* message = swift_uri_acquire_read();
-			if (message == NULL) {
+			if (message == NULL || configuration == NULL) {
 				continue;
 			}
 			if (curl == NULL) {
@@ -137,6 +145,8 @@ int main(void) {
 			free(hashes);
 		}
 	}
+
+	free(configuration);
 
 	curl_easy_cleanup(curl);
 	return EXIT_SUCCESS;

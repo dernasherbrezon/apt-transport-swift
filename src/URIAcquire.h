@@ -3,8 +3,6 @@
 
 #include <stdbool.h>
 
-#include "common.h"
-
 struct URIAcquire {
 	char *uri;
 	char *filename;
@@ -12,7 +10,7 @@ struct URIAcquire {
 	bool expectedSha1;
 	bool expectedSha256;
 	bool expectedSha512;
-//FIXME last modified?
+	char *lastModified;
 };
 
 struct URIAcquire* swift_uri_acquire_read();
