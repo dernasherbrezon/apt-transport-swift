@@ -49,10 +49,12 @@ struct URIAcquire* swift_uri_acquire_read(FILE *source) {
 	}
 	if (result->uri == NULL) {
 		fprintf(stderr, "invalid URIAcquire request. Expected URI");
+		free(result);
 		return NULL;
 	}
 	if (result->filename == NULL) {
 		fprintf(stderr, "invalid URIAcquire request. Expected Filename");
+		free(result);
 		return NULL;
 	}
 	return result;

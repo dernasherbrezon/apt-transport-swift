@@ -3,7 +3,9 @@
 
 struct Configuration {
 	char *proxyHostPort;
-	char *proxyAuth;
+	char *container;
+	char *username;
+	char *password;
 };
 
 struct Configuration* swift_configuration_read();

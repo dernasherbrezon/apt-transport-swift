@@ -10,7 +10,10 @@ START_TEST (test_readmessage) {
 	struct Configuration* message = swift_configuration_read(fp);
 	fclose(fp);
 	ck_assert(message);
-	ck_assert_str_eq(message->proxyHostPort, "https://host:8080");
+	ck_assert_str_eq(message->proxyHostPort, "https://username:password@host:8080");
+	ck_assert_str_eq(message->container, "test");
+	ck_assert_str_eq(message->username, "username");
+	ck_assert_str_eq(message->password, "password");
 	free(message);
 }
 END_TEST

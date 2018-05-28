@@ -1,2 +1,5 @@
 601 Configuration
-Config-Item: Acquire::https::Proxy=https://host:8080
+Config-Item: Acquire::https::Proxy=https://username:password@host:8080
+Config-Item: Swift::Container::Name=test
+Config-Item: Swift::Auth::Username=username
+Config-Item: Swift::Auth::Password=password

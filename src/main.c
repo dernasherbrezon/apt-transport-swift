@@ -92,9 +92,9 @@ int main(void) {
 		if (startsWith(line, "601")) {
 			configuration = swift_configuration_read(stdin);
 			if (configuration == NULL) {
-				continue;
+				//unable to parse configuration. this is critical
+				break;
 			}
-			//FIXME handle configuration
 		} else if (startsWith(line, "600")) {
 			struct URIAcquire* message = swift_uri_acquire_read(stdin);
 			if (message == NULL || configuration == NULL) {
@@ -111,6 +111,9 @@ int main(void) {
 			curl_easy_setopt(curl, CURLOPT_URL, message->uri);
 			curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
 			curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
+			if (configuration->proxyHostPort != NULL) {
+				curl_easy_setopt(curl, CURLOPT_PROXY, configuration->proxyHostPort);
+			}
 			FILE *pagefile = fopen(message->filename, "wb");
 			if (!pagefile) {
 				swift_responseError(message->uri, "unable to write file");
