@@ -11,6 +11,7 @@ START_TEST (test_readmessage) {
 	fclose(fp);
 	ck_assert(message);
 	ck_assert_str_eq(message->proxyHostPort, "https://host:8080");
+	free(message);
 }
 END_TEST
 
