@@ -14,8 +14,8 @@ START_TEST (test_readmessage) {
 	ck_assert(message->expectedSha1 == true);
 	ck_assert(message->expectedSha256 == false);
 	ck_assert(message->expectedSha512 == false);
-	ck_assert_str_eq(message->filename, "/somedir/data.html");
-	ck_assert_str_eq(message->uri, "https://example.com");
+	ck_assert_str_eq(message->filename, "dists_stretch_InRelease");
+	ck_assert_str_eq(message->uri, "https://example.com/v1/username/container/dists/stretch/InRelease");
 	ck_assert_str_eq(message->lastModified, "Wed, 23 May 2018 14:13:16 GMT");
 	free(message);
 }

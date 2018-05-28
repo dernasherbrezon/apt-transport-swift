@@ -1,13 +1,3 @@
-/*
- ============================================================================
- Name        : apt-transport-swift2.c
- Author      : dernasherbrezon
- Version     :
- Copyright   : Your copyright notice
- Description : Hello World in C, Ansi-style
- ============================================================================
- */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -133,7 +123,7 @@ int main(void) {
 				continue;
 			}
 			if (response_code != 200) {
-				swift_responseError(message->uri, "Not good");
+				swift_responseError(message->uri, "invalid response code");
 				continue;
 			}
 
