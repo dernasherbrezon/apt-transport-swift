@@ -22,11 +22,22 @@ struct URIAcquire* swift_uri_acquire_read(FILE *source) {
 				|| (strcmp(line, "\n") == 0)) {
 			break;
 		}
-		if (startsWith(line, "URI: ")) {
-			result->uri = substring(line, 5);
-		} else if (startsWith(line, "Filename: ")) {
-			result->filename = substring(line, 10);
-		} else if (startsWith(line, "Expected-MD5Sum")) {
+		char* uri = cutPrefix(line, "URI: ");
+		if (uri != NULL) {
+			result->uri = uri;
+			continue;
+		}
+		char *filename = cutPrefix(line, "Filename: ");
+		if (filename != NULL) {
+			result->filename = filename;
+			continue;
+		}
+		char *lastModified = cutPrefix(line, "Last-Modified: ");
+		if (lastModified != NULL) {
+			result->lastModified = lastModified;
+			continue;
+		}
+		if (startsWith(line, "Expected-MD5Sum")) {
 			result->expectedMd5 = true;
 		} else if (startsWith(line, "Expected-SHA1")) {
 			result->expectedSha1 = true;
@@ -34,8 +45,6 @@ struct URIAcquire* swift_uri_acquire_read(FILE *source) {
 			result->expectedSha256 = true;
 		} else if (startsWith(line, "Expected-SHA512")) {
 			result->expectedSha512 = true;
-		} else if (startsWith(line, "Last-Modified")) {
-			result->lastModified = substring(line, 13);
 		}
 	}
 	if (result->uri == NULL) {

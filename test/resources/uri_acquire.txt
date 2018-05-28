@@ -2,3 +2,4 @@
 URI: https://example.com
 Filename: /somedir/data.html
 Expected-SHA1: 123
+Last-Modified: Wed, 23 May 2018 14:13:16 GMT
