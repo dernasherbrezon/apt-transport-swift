@@ -1,0 +1,4 @@
+600 URI Acquire
+URI: https://example.com
+Filename: /somedir/data.html
+Expected-SHA1: 123

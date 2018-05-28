@@ -96,7 +96,7 @@ int main(void) {
 			}
 			//FIXME handle configuration
 		} else if (startsWith(line, "600")) {
-			struct URIAcquire* message = swift_uri_acquire_read();
+			struct URIAcquire* message = swift_uri_acquire_read(stdin);
 			if (message == NULL || configuration == NULL) {
 				continue;
 			}

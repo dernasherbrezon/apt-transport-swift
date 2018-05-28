@@ -4,7 +4,7 @@
 #include "URIAcquire.h"
 #include "common.h"
 
-struct URIAcquire* swift_uri_acquire_read() {
+struct URIAcquire* swift_uri_acquire_read(FILE *source) {
 	char *line = NULL;
 	size_t len = 0;
 	ssize_t readBytes;
@@ -18,7 +18,7 @@ struct URIAcquire* swift_uri_acquire_read() {
 	result->expectedSha256 = false;
 	result->expectedSha512 = false;
 	while (true) {
-		if ((readBytes = getline(&line, &len, stdin)) == -1
+		if ((readBytes = getline(&line, &len, source)) == -1
 				|| (strcmp(line, "\n") == 0)) {
 			break;
 		}
