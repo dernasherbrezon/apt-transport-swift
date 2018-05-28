@@ -12,11 +12,6 @@ START_TEST (test_startsWith) {
 }
 END_TEST
 
-START_TEST (test_substring) {
-	ck_assert_str_eq(substring("Config-Item: Acquire::https::Proxy=http://proxy:80", 13) , "Acquire::https::Proxy=http://proxy:80");
-}
-END_TEST
-
 void assertTrim(const char *str, const char* expected) {
 	char *mutable = (char*) malloc(strlen(str));
 	ck_assert_str_eq(trim(strcpy(mutable, str)), expected);
@@ -47,7 +42,6 @@ Suite * common_suite(void) {
 
 	tcase_add_test(tc_core, test_cutPrefix);
 	tcase_add_test(tc_core, test_startsWith);
-	tcase_add_test(tc_core, test_substring);
 	tcase_add_test(tc_core, test_trim);
 	suite_add_tcase(s, tc_core);
 

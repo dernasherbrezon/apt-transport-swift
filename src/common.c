@@ -26,14 +26,6 @@ char* cutPrefix(const char* str, const char* prefix) {
 	return trim(result);
 }
 
-char* substring(const char *str, size_t index) {
-	size_t resultSize = strlen(str) - index;
-	char* result = (char*) malloc(resultSize);
-	strncpy(result, &str[index], strlen(str) - index);
-	result[resultSize - 1] = '\0'; //-1 to replace \n
-	return result;
-}
-
 char *trim(char *str) {
 	size_t len = 0;
 	char *frontp = str;
