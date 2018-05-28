@@ -8,10 +8,22 @@ bool startsWith(const char *str, const char *pre) {
 }
 
 char* cutPrefix(const char* str, const char* prefix) {
-	if (!startsWith(str, prefix)) {
+	size_t prefixLength = strlen(prefix);
+	size_t strLength = strlen(str);
+	if (prefixLength > strLength) {
 		return NULL;
 	}
-	return substring(str, strlen(prefix));
+	int i = 0;
+	for (; i < prefixLength; i++) {
+		if (str[i] != prefix[i]) {
+			return NULL;
+		}
+	}
+	size_t resultSize = strLength - i + 1;
+	char* result = (char*) malloc(resultSize);
+	strncpy(result, &str[i], resultSize);
+	result[resultSize] = '\0';
+	return trim(result);
 }
 
 char* substring(const char *str, size_t index) {

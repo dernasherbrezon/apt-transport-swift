@@ -6,7 +6,7 @@
 #include "common.h"
 #include "Configuration.h"
 
-struct Configuration* swift_configuration_read() {
+struct Configuration* swift_configuration_read(FILE* source) {
 	char *line = NULL;
 	size_t len = 0;
 	ssize_t readBytes;
@@ -17,18 +17,13 @@ struct Configuration* swift_configuration_read() {
 	result->proxyHostPort = NULL;
 	result->proxyAuth = NULL;
 	while (true) {
-		if ((readBytes = getline(&line, &len, stdin)) == -1
+		if ((readBytes = getline(&line, &len, source)) == -1
 				|| (strcmp(line, "\n") == 0)) {
 			break;
 		}
-
-		if (startsWith(line, "Acquire::https::Proxy=")) {
-			char * fullUrl = substring(line, 22);
-			if (startsWith(fullUrl, "@")) {
-				//FIXME
-			} else {
-				result->proxyHostPort = fullUrl;
-			}
+		char *fullUrl = cutPrefix(line, "Config-Item: Acquire::https::Proxy=");
+		if (fullUrl != NULL) {
+			result->proxyHostPort = fullUrl;
 		}
 	}
 	return result;

@@ -1,0 +1,1 @@
+Config-Item: Acquire::https::Proxy=https://host:8080

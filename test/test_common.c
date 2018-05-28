@@ -3,7 +3,7 @@
 #include "../src/common.h"
 
 START_TEST (test_cutPrefix) {
-	ck_assert_str_eq(cutPrefix("Config-Item: Acquire::https::Proxy=http://proxy:80", "Config-Item: Acquire::https::Proxy="), "http://proxy:80");
+	ck_assert_str_eq(cutPrefix("Config-Item: Acquire", "Config-Item: "), "Acquire");
 }
 END_TEST
 

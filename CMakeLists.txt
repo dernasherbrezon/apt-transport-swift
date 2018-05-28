@@ -18,6 +18,9 @@ target_link_libraries(swift swiftlib curl ssl crypto)
 enable_testing()
 
 file(GLOB TEST_SOURCES test/test_*.c)
+file(GLOB TEST_RESOURCES test/resources/*)
+file(COPY ${TEST_RESOURCES} DESTINATION "${CMAKE_BINARY_DIR}")
+
 foreach(curTest ${TEST_SOURCES})
 	get_filename_component(curTestName ${curTest} NAME_WE)
 	add_test(NAME ${curTestName} COMMAND ${curTestName} ${curTest})

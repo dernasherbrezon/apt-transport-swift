@@ -90,7 +90,7 @@ int main(void) {
 			break;
 		}
 		if (startsWith(line, "601")) {
-			configuration = swift_configuration_read();
+			configuration = swift_configuration_read(stdin);
 			if (configuration == NULL) {
 				continue;
 			}
