@@ -36,8 +36,7 @@ void swift_responseStatus(const char* uri, const char* message) {
 	fprintf(stdout, "Message: %s\n", message);
 }
 
-void swift_response(const struct URIAcquire* request,
-		const struct Hashes* hashes) {
+void swift_response(const struct URIAcquire* request, const struct Hashes* hashes) {
 	fprintf(stdout, "201 URI Done\n");
 	fprintf(stdout, "URI: %s\n", request->uri);
 	fprintf(stdout, "Filename: %s\n", request->filename);
@@ -99,7 +98,9 @@ int main(void) {
 			}
 
 			curl_easy_setopt(curl, CURLOPT_URL, message->uri);
-			curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+			if (configuration->verbose) {
+				curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+			}
 			curl_easy_setopt(curl, CURLOPT_USERAGENT, "apt-transport-swift");
 			curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
 			if (configuration->proxyHostPort != NULL) {

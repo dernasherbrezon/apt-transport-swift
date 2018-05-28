@@ -1,5 +1,4 @@
 #include <stdlib.h>
-#include <stdbool.h>
 #include <string.h>
 
 #include "common.h"
@@ -14,6 +13,7 @@ struct Configuration* swift_configuration_read(FILE* source) {
 		return NULL;
 	}
 	result->proxyHostPort = NULL;
+	result->verbose = false;
 	while (true) {
 		if ((readBytes = getline(&line, &len, source)) == -1 || (strcmp(line, "\n") == 0)) {
 			break;
@@ -36,6 +36,10 @@ struct Configuration* swift_configuration_read(FILE* source) {
 		char *password = cutPrefix(line, "Config-Item: Swift::Auth::Password=");
 		if (password != NULL) {
 			result->password = password;
+			continue;
+		}
+		if (strcmp(trim(line), "Config-Item: Debug::Acquire::https=true") == 0) {
+			result->verbose = true;
 			continue;
 		}
 		// do not support anonymous explicitly

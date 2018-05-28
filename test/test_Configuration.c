@@ -14,6 +14,7 @@ START_TEST (test_readmessage) {
 	ck_assert_str_eq(message->container, "test");
 	ck_assert_str_eq(message->username, "username");
 	ck_assert_str_eq(message->password, "password");
+	ck_assert(message->verbose == true);
 	free(message);
 }
 END_TEST
