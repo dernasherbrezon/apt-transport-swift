@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <stdlib.h>
 
 #include "URIAcquire.h"
@@ -13,6 +12,8 @@ struct URIAcquire* swift_uri_acquire_read(FILE *source) {
 		return NULL;
 	}
 	result->lastModified = NULL;
+	result->container = NULL;
+	result->username = NULL;
 	result->expectedMd5 = false;
 	result->expectedSha1 = false;
 	result->expectedSha256 = false;

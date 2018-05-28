@@ -2,6 +2,7 @@
 #define URIACQUIRE_H_
 
 #include <stdbool.h>
+#include <stdio.h>
 
 struct URIAcquire {
 	char *uri;
@@ -11,8 +12,10 @@ struct URIAcquire {
 	bool expectedSha256;
 	bool expectedSha512;
 	char *lastModified;
+	char *container;
+	char *username;
 };
 
-struct URIAcquire* swift_uri_acquire_read();
+struct URIAcquire* swift_uri_acquire_read(FILE *source);
 
 #endif /* URIACQUIRE_H_ */

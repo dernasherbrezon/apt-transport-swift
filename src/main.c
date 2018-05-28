@@ -100,6 +100,7 @@ int main(void) {
 
 			curl_easy_setopt(curl, CURLOPT_URL, message->uri);
 			curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+			curl_easy_setopt(curl, CURLOPT_USERAGENT, "apt-transport-swift");
 			curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
 			if (configuration->proxyHostPort != NULL) {
 				curl_easy_setopt(curl, CURLOPT_PROXY, configuration->proxyHostPort);
