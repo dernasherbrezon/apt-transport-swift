@@ -23,6 +23,10 @@ find_package(JSON-C REQUIRED)
 include_directories(${JSON-C_INCLUDE_DIRS})
 target_link_libraries(swift ${JSON-C_LIBRARIES} uriparser)
 
+find_package(UriParser REQUIRED)
+include_directories(${URIPARSER_INCLUDE_DIR})
+target_link_libraries(swift ${URIPARSER_LIBRARY})
+
 enable_testing()
 
 file(GLOB TEST_SOURCES test/test_*.c)
@@ -35,5 +39,5 @@ foreach(curTest ${TEST_SOURCES})
 	get_filename_component(curTestName ${curTest} NAME_WE)
 	add_test(NAME ${curTestName} COMMAND ${curTestName} ${curTest})
 	add_executable(${curTestName} ${curTest})
-	target_link_libraries(${curTestName} swiftlib ${CURL_LIBRARIES} ${OPENSSL_SSL_LIBRARY} ${OPENSSL_CRYPTO_LIBRARY} ${JSON-C_LIBRARIES} uriparser check ${CMAKE_THREAD_LIBS_INIT})
+	target_link_libraries(${curTestName} swiftlib ${CURL_LIBRARIES} ${OPENSSL_SSL_LIBRARY} ${OPENSSL_CRYPTO_LIBRARY} ${JSON-C_LIBRARIES} ${URIPARSER_LIBRARY} check ${CMAKE_THREAD_LIBS_INIT})
 endforeach()
