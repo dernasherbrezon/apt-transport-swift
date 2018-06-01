@@ -6,14 +6,15 @@
 
 struct URIAcquire {
 	char *uri;
+	char *container;
+	char *path;
+
 	char *filename;
 	bool expectedMd5;
 	bool expectedSha1;
 	bool expectedSha256;
 	bool expectedSha512;
 	char *lastModified;
-	char *container;
-	char *username;
 };
 
 struct URIAcquire* swift_uri_acquire_read(FILE *source);

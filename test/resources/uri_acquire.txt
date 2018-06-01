@@ -1,5 +1,5 @@
 600 URI Acquire
-URI: https://example.com/v1/username/container/dists/stretch/InRelease
+URI: swift://container/dists/stretch/InRelease
 Filename: dists_stretch_InRelease
 Expected-SHA1: 123
 Last-Modified: Wed, 23 May 2018 14:13:16 GMT
