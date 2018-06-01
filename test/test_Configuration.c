@@ -11,10 +11,30 @@ START_TEST (test_readmessage) {
 	fclose(fp);
 	ck_assert(message);
 	ck_assert_str_eq(message->proxyHostPort, "https://username:password@host:8080");
-	ck_assert_str_eq(message->container, "test");
-	ck_assert_str_eq(message->username, "username");
-	ck_assert_str_eq(message->password, "password");
+	ck_assert(message->containers);
+	ck_assert_int_eq(message->containers->count, 2);
+
+	struct ContainerConfiguration *value1 = swift_configuration_find_by_container(message, "test0");
+	ck_assert(value1);
+	ck_assert_str_eq(value1->id, "0");
+	ck_assert_str_eq(value1->url, "https://example.com/v1");
+	ck_assert_str_eq(value1->container, "test0");
+	ck_assert_str_eq(value1->username, "username0");
+	ck_assert_str_eq(value1->password, "password0");
+
+	struct ContainerConfiguration *value2 = swift_configuration_find_by_container(message, "test1");
+	ck_assert(value2);
+	ck_assert_str_eq(value2->id, "17");
+	ck_assert_str_eq(value2->url, "https://example.com/v3");
+	ck_assert_str_eq(value2->container, "test1");
+	ck_assert_str_eq(value2->username, "username1");
+	ck_assert_str_eq(value2->password, "password1");
+
 	ck_assert(message->verbose == true);
+
+	struct ContainerConfiguration *value3 = swift_configuration_find_by_container(message, "unknown");
+	ck_assert(value3 == NULL);
+
 	free(message);
 }
 END_TEST
