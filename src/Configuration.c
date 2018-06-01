@@ -4,20 +4,20 @@
 #include "common.h"
 #include "Configuration.h"
 
-int push_back(struct ListOfConfigurations **fubar, struct ContainerConfiguration* value) {
+bool push_back(struct ListOfConfigurations **fubar, struct ContainerConfiguration* value) {
 	size_t x = *fubar ? fubar[0]->count : 0, y = x + 1;
 
 	if ((x & y) == 0) {
 		void *temp = realloc(*fubar, sizeof **fubar + (x + y) * sizeof fubar[0]->value[0]);
 		if (!temp) {
-			return 1;
+			return false;
 		}
 		*fubar = temp; // or, if you like, `fubar[0] = temp;`
 	}
 
 	fubar[0]->value[x] = value;
 	fubar[0]->count = y;
-	return 0;
+	return true;
 }
 
 struct ContainerConfiguration * swift_configuration_find_by_id(struct ListOfConfigurations *fubar, const char* id) {
@@ -77,12 +77,17 @@ struct Configuration* swift_configuration_read(FILE* source) {
 			struct ContainerConfiguration * config = swift_configuration_find_by_id(result->containers, pch);
 			if (config == NULL) {
 				config = malloc(sizeof(struct ContainerConfiguration));
+				if (config == NULL) {
+					break;
+				}
 				config->id = pch;
 				config->container = NULL;
 				config->password = NULL;
 				config->url = NULL;
 				config->username = NULL;
-				push_back(&result->containers, config);
+				if (!push_back(&result->containers, config)) {
+					break;
+				}
 			}
 			pch = strtok(NULL, "=");
 			if (pch == NULL) {

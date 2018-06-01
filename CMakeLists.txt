@@ -1,19 +1,27 @@
 cmake_minimum_required(VERSION 2.8)
 project(apt-transport-swift)
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
+
 file(GLOB SOURCES src/*.c)
 list(REMOVE_ITEM SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/main.c")
 
-add_library(swiftlib ${SOURCES})
-
-include_directories(/usr/local/include)
-include_directories(/opt/local/include)
-
-link_directories(/opt/local/lib)
-link_directories(/usr/local/lib)
-
 add_executable(swift src/main.c)
-target_link_libraries(swift swiftlib curl ssl crypto)
+
+add_library(swiftlib ${SOURCES})
+target_link_libraries(swift swiftlib)
+
+find_package(OpenSSL REQUIRED)
+include_directories(${OPENSSL_INCLUDE_DIR})
+target_link_libraries(swift ${OPENSSL_SSL_LIBRARY} ${OPENSSL_CRYPTO_LIBRARY})
+
+find_package(CURL REQUIRED)
+include_directories(${CURL_INCLUDE_DIRS})
+target_link_libraries(swift ${CURL_LIBRARIES})
+
+find_package(JSON-C REQUIRED)
+include_directories(${JSON-C_INCLUDE_DIRS})
+target_link_libraries(swift ${JSON-C_LIBRARIES} uriparser)
 
 enable_testing()
 
@@ -21,9 +29,11 @@ file(GLOB TEST_SOURCES test/test_*.c)
 file(GLOB TEST_RESOURCES test/resources/*)
 file(COPY ${TEST_RESOURCES} DESTINATION "${CMAKE_BINARY_DIR}")
 
+find_package(Threads REQUIRED)
+
 foreach(curTest ${TEST_SOURCES})
 	get_filename_component(curTestName ${curTest} NAME_WE)
 	add_test(NAME ${curTestName} COMMAND ${curTestName} ${curTest})
 	add_executable(${curTestName} ${curTest})
-	target_link_libraries(${curTestName} swiftlib curl ssl crypto check)
+	target_link_libraries(${curTestName} swiftlib ${CURL_LIBRARIES} ${OPENSSL_SSL_LIBRARY} ${OPENSSL_CRYPTO_LIBRARY} ${JSON-C_LIBRARIES} uriparser check ${CMAKE_THREAD_LIBS_INIT})
 endforeach()
