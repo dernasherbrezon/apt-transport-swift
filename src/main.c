@@ -142,12 +142,12 @@ int main(void) {
 			}
 			fclose(pagefile);
 			swift_response(message, hashes);
-			free(message);
-			free(hashes);
+			swift_uri_acquire_free(message);
+			swift_hash_file_free(hashes);
 		}
 	}
 
-	free(configuration);
+	swift_configuration_free(configuration);
 
 	curl_easy_cleanup(curl);
 	return EXIT_SUCCESS;

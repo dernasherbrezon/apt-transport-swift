@@ -35,7 +35,7 @@ START_TEST (test_readmessage) {
 	struct ContainerConfiguration *value3 = swift_configuration_find_by_container(message, "unknown");
 	ck_assert(value3 == NULL);
 
-	free(message);
+	swift_configuration_free(message);
 }
 END_TEST
 

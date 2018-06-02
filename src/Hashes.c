@@ -63,6 +63,7 @@ struct Hashes* swift_hash_file(struct URIAcquire* req, FILE* file) {
 		unsigned char* md5 = malloc(sizeof(char) * MD5_DIGEST_LENGTH);
 		MD5_Final(md5, &mdContext);
 		result->md5 = swift_convertToHexString(md5, MD5_DIGEST_LENGTH);
+		free(md5);
 	} else {
 		result->md5 = NULL;
 	}
@@ -70,6 +71,7 @@ struct Hashes* swift_hash_file(struct URIAcquire* req, FILE* file) {
 		unsigned char* sha1 = malloc(sizeof(char) * SHA_DIGEST_LENGTH);
 		SHA1_Final(sha1, &sha1Context);
 		result->sha1 = swift_convertToHexString(sha1, SHA_DIGEST_LENGTH);
+		free(sha1);
 	} else {
 		result->sha1 = NULL;
 	}
@@ -77,6 +79,7 @@ struct Hashes* swift_hash_file(struct URIAcquire* req, FILE* file) {
 		unsigned char* sha256 = malloc(sizeof(char) * SHA256_DIGEST_LENGTH);
 		SHA256_Final(sha256, &sha256Context);
 		result->sha256 = swift_convertToHexString(sha256, SHA256_DIGEST_LENGTH);
+		free(sha256);
 	} else {
 		result->sha256 = NULL;
 	}
@@ -84,6 +87,7 @@ struct Hashes* swift_hash_file(struct URIAcquire* req, FILE* file) {
 		unsigned char* sha512 = malloc(sizeof(char) * SHA512_DIGEST_LENGTH);
 		SHA512_Final(sha512, &sha512Context);
 		result->sha512 = swift_convertToHexString(sha512, SHA512_DIGEST_LENGTH);
+		free(sha512);
 	} else {
 		result->sha512 = NULL;
 	}
@@ -94,3 +98,13 @@ struct Hashes* swift_hash_file(struct URIAcquire* req, FILE* file) {
 	return result;
 }
 
+void swift_hash_file_free(struct Hashes* obj) {
+	if( obj == NULL ) {
+		return;
+	}
+	free(obj->md5);
+	free(obj->sha1);
+	free(obj->sha256);
+	free(obj->sha512);
+	free(obj);
+}

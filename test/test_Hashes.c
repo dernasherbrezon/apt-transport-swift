@@ -19,6 +19,7 @@ START_TEST (test_md5Only) {
 	ck_assert(hashes->sha256 == NULL);
 	ck_assert(hashes->sha512 == NULL);
 	ck_assert_int_eq(hashes->fileSize, 11);
+	swift_hash_file_free(hashes);
 }
 END_TEST
 
@@ -39,6 +40,7 @@ START_TEST (test_hashes) {
 	ck_assert_str_eq(hashes->sha256, "f107aac59dff1d49ebfedb7f03877eaa0297f9a7d3cff26edfc75406f222256d");
 	ck_assert_str_eq(hashes->sha512, "334a142ae03fa3e64b5ee6b1ed4e406305d2653567fa874465f749856ba64d3afac7621bc49b62374bd8abb397999911b1848a6ede015d2151af8ff343fa0f60");
 	ck_assert_int_eq(hashes->fileSize, 11);
+	swift_hash_file_free(hashes);
 }
 END_TEST
 

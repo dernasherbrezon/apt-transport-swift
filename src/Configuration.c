@@ -17,7 +17,7 @@ bool push_back(struct ListOfConfigurations **fubar, struct ContainerConfiguratio
 		if (!temp) {
 			return false;
 		}
-		*fubar = temp; // or, if you like, `fubar[0] = temp;`
+		*fubar = temp;
 	}
 
 	fubar[0]->value[x] = value;
@@ -77,6 +77,7 @@ struct Configuration* swift_configuration_read(FILE* source) {
 			pch = strtok(container, ":");
 			if (pch == NULL) {
 				fprintf(stderr, "invalid format: %s\n", container);
+				free(container);
 				continue;
 			}
 			struct ContainerConfiguration * config = swift_configuration_find_by_id(result->containers, pch);
@@ -85,39 +86,47 @@ struct Configuration* swift_configuration_read(FILE* source) {
 				if (config == NULL) {
 					break;
 				}
-				config->id = pch;
+				config->id = strdup(pch);
 				config->container = NULL;
 				config->password = NULL;
 				config->url = NULL;
 				config->username = NULL;
 				if (!push_back(&result->containers, config)) {
+					free(config);
+					free(container);
 					break;
 				}
 			}
-			pch = strtok(NULL, "=");
+			pch = strdup(strtok(NULL, "="));
 			if (pch == NULL) {
 				fprintf(stderr, "invalid format: %s\n", container);
+				free(container);
 				continue;
 			}
-			char *value = strtok(NULL, "=");
+			char *value = strdup(strtok(NULL, "="));
 			if (value == NULL) {
 				fprintf(stderr, "invalid format: %s\n", container);
+				free(container);
 				continue;
 			}
 			if (strcmp(pch, ":Name") == 0) {
 				config->container = value;
+				free(container);
 				continue;
 			}
 			if (strcmp(pch, ":Username") == 0) {
 				config->username = value;
+				free(container);
 				continue;
 			}
 			if (strcmp(pch, ":Password") == 0) {
 				config->password = value;
+				free(container);
 				continue;
 			}
 			if (strcmp(pch, ":URL") == 0) {
 				config->url = value;
+				free(container);
 				continue;
 			}
 			continue;
@@ -132,8 +141,28 @@ struct Configuration* swift_configuration_read(FILE* source) {
 	// use plain https/http transport for anonymous access
 	if (result->containers == NULL || result->containers->count == 0) {
 		fprintf(stderr, "container is not configured\n");
-		free(result);
+		swift_configuration_free(result);
 		return NULL;
 	}
 	return result;
+}
+
+void swift_configuration_free(struct Configuration* obj) {
+	if (obj == NULL) {
+		return;
+	}
+	free(obj->proxyHostPort);
+	if (obj->containers != NULL) {
+		for (int i = 0; i < obj->containers->count; i++) {
+			struct ContainerConfiguration* cur = obj->containers->value[i];
+			free(cur->container);
+			free(cur->id);
+			free(cur->password);
+			free(cur->url);
+			free(cur->username);
+			free(cur);
+		}
+		free(obj->containers);
+	}
+	free(obj);
 }

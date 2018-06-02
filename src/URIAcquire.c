@@ -98,18 +98,30 @@ struct URIAcquire* swift_uri_acquire_read(FILE *source) {
 	}
 	if (result->uri == NULL) {
 		fprintf(stderr, "invalid URIAcquire request. Expected URI\n");
-		free(result);
+		swift_uri_acquire_free(result);
 		return NULL;
 	}
 	if (result->container == NULL || result->path == NULL) {
 		fprintf(stderr, "invalid URIAcquire request. Invalid URI format. Expected: swift://container/path\n");
-		free(result);
+		swift_uri_acquire_free(result);
 		return NULL;
 	}
 	if (result->filename == NULL) {
 		fprintf(stderr, "invalid URIAcquire request. Expected Filename\n");
-		free(result);
+		swift_uri_acquire_free(result);
 		return NULL;
 	}
 	return result;
+}
+
+void swift_uri_acquire_free(struct URIAcquire* obj) {
+	if( obj == NULL ) {
+		return;
+	}
+	free(obj->container);
+	free(obj->filename);
+	free(obj->lastModified);
+	free(obj->path);
+	free(obj->uri);
+	free(obj);
 }

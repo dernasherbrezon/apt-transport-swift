@@ -27,4 +27,6 @@ struct Configuration* swift_configuration_read(FILE* source);
 
 struct ContainerConfiguration* swift_configuration_find_by_container(struct Configuration *config, const char* containerName);
 
+void swift_configuration_free(struct Configuration* obj);
+
 #endif /* CONFIGURATION_H_ */

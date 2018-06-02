@@ -19,7 +19,7 @@ START_TEST (test_readmessage) {
 	ck_assert_str_eq(message->container, "container");
 	ck_assert_str_eq(message->path, "/dists/stretch/InRelease");
 	ck_assert_str_eq(message->lastModified, "Wed, 23 May 2018 14:13:16 GMT");
-	free(message);
+	swift_uri_acquire_free(message);
 }
 END_TEST
 

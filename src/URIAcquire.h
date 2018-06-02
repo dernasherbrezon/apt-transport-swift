@@ -19,4 +19,6 @@ struct URIAcquire {
 
 struct URIAcquire* swift_uri_acquire_read(FILE *source);
 
+void swift_uri_acquire_free(struct URIAcquire* obj);
+
 #endif /* URIACQUIRE_H_ */

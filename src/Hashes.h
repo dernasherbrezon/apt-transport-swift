@@ -16,4 +16,6 @@ struct Hashes {
 
 struct Hashes* swift_hash_file(struct URIAcquire* req, FILE* file);
 
+void swift_hash_file_free(struct Hashes* obj);
+
 #endif /* HASHES_H_ */
