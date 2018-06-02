@@ -19,8 +19,8 @@ char* cutPrefix(const char* str, const char* prefix) {
 			return NULL;
 		}
 	}
-	size_t resultSize = strLength - i + 1;
-	char* result = (char*) malloc(resultSize);
+	size_t resultSize = strLength - i;
+	char* result = (char*) malloc(resultSize + 1);
 	strncpy(result, &str[i], resultSize);
 	result[resultSize] = '\0';
 	return trim(result);

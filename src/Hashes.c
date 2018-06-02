@@ -1,3 +1,6 @@
+#if !defined(_POSIX_C_SOURCE)
+#define _POSIX_C_SOURCE 201410L
+#endif
 #include <openssl/md5.h>
 #include <openssl/sha.h>
 #include <sys/stat.h>
