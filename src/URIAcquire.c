@@ -1,4 +1,6 @@
 #include <stdlib.h>
+#include <stdio.h>
+#include <sys/types.h>
 #include <uriparser/Uri.h>
 
 #include "URIAcquire.h"

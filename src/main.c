@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <stdbool.h>
 #include <curl/curl.h>
+#include <sys/types.h>
 
 #include "common.h"
 #include "Hashes.h"
@@ -95,6 +96,8 @@ int main(void) {
 				if (!curl) {
 					break;
 				}
+
+
 			}
 
 			curl_easy_setopt(curl, CURLOPT_URL, message->uri);
