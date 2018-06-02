@@ -2,12 +2,12 @@ cmake_minimum_required(VERSION 2.8)
 project(apt-transport-swift)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
+set(CMAKE_C_FLAGS "-std=c99")
 
 file(GLOB SOURCES src/*.c)
 list(REMOVE_ITEM SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/main.c")
 
 add_executable(swift src/main.c)
-set_property(TARGET swift PROPERTY C_STANDARD 99)
 
 add_library(swiftlib ${SOURCES})
 target_link_libraries(swift swiftlib)
