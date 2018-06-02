@@ -65,16 +65,15 @@ struct URIAcquire* swift_uri_acquire_read(FILE *source) {
 	result->expectedSha256 = false;
 	result->expectedSha512 = false;
 	while (true) {
+		free(line);
+		line = NULL;
 		if ((readBytes = getline(&line, &len, source)) == -1 || (strcmp(line, "\n") == 0)) {
-			free(line);
 			break;
 		}
 		char* uri = cutPrefix(line, "URI: ");
 		if (uri != NULL) {
 			result->uri = uri;
 			if (!swift_uri_acquire_parse_uri(uri, result)) {
-				free(line);
-				line = NULL;
 				break;
 			}
 			continue;
@@ -82,15 +81,11 @@ struct URIAcquire* swift_uri_acquire_read(FILE *source) {
 		char *filename = cutPrefix(line, "Filename: ");
 		if (filename != NULL) {
 			result->filename = filename;
-			free(line);
-			line = NULL;
 			continue;
 		}
 		char *lastModified = cutPrefix(line, "Last-Modified: ");
 		if (lastModified != NULL) {
 			result->lastModified = lastModified;
-			free(line);
-			line = NULL;
 			continue;
 		}
 		if (startsWith(line, "Expected-MD5Sum")) {
@@ -102,9 +97,11 @@ struct URIAcquire* swift_uri_acquire_read(FILE *source) {
 		} else if (startsWith(line, "Expected-SHA512")) {
 			result->expectedSha512 = true;
 		}
-		free(line);
-		line = NULL;
 	}
+
+	free(line);
+	line = NULL;
+
 	if (result->uri == NULL) {
 		fprintf(stderr, "invalid URIAcquire request. Expected URI\n");
 		swift_uri_acquire_free(result);

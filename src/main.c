@@ -79,6 +79,8 @@ int main(void) {
 	struct Configuration *configuration = NULL;
 
 	while (true) {
+		free(line);
+		line = NULL;
 		if ((readBytes = getline(&line, &len, stdin)) == -1) {
 			break;
 		}
@@ -88,7 +90,9 @@ int main(void) {
 				//unable to parse configuration. this is critical
 				break;
 			}
-		} else if (startsWith(line, "600")) {
+			continue;
+		}
+		if (startsWith(line, "600")) {
 			struct URIAcquire* message = swift_uri_acquire_read(stdin);
 			if (message == NULL || configuration == NULL) {
 				continue;
@@ -97,10 +101,9 @@ int main(void) {
 				curl_global_init(CURL_GLOBAL_DEFAULT);
 				curl = curl_easy_init();
 				if (!curl) {
+					swift_uri_acquire_free(message);
 					break;
 				}
-
-
 			}
 
 			curl_easy_setopt(curl, CURLOPT_URL, message->uri);
@@ -115,6 +118,7 @@ int main(void) {
 			FILE *pagefile = fopen(message->filename, "wb");
 			if (!pagefile) {
 				swift_responseError(message->uri, "unable to write file");
+				swift_uri_acquire_free(message);
 				continue;
 			}
 			curl_easy_setopt(curl, CURLOPT_WRITEDATA, pagefile);
@@ -122,30 +126,37 @@ int main(void) {
 			fclose(pagefile);
 			if (res != CURLE_OK) {
 				swift_responseError(message->uri, curl_easy_strerror(res));
+				swift_uri_acquire_free(message);
 				continue;
 			}
 			long response_code;
 			curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
 			if (response_code == 304) {
 				swift_not_modified(message);
+				swift_uri_acquire_free(message);
 				continue;
 			}
 			if (response_code != 200) {
 				swift_responseError(message->uri, "invalid response code");
+				swift_uri_acquire_free(message);
 				continue;
 			}
 
 			pagefile = fopen(message->filename, "rb");
 			struct Hashes* hashes = swift_hash_file(message, pagefile);
+			fclose(pagefile);
 			if (hashes == NULL) {
+				swift_uri_acquire_free(message);
 				continue;
 			}
-			fclose(pagefile);
 			swift_response(message, hashes);
 			swift_uri_acquire_free(message);
 			swift_hash_file_free(hashes);
+			continue;
 		}
 	}
+	free(line);
+	line = NULL;
 
 	swift_configuration_free(configuration);
 

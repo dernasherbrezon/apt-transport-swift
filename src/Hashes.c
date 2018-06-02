@@ -19,6 +19,9 @@ char* swift_convertToHexString(unsigned char* str, int arraySize) {
 }
 
 struct Hashes* swift_hash_file(struct URIAcquire* req, FILE* file) {
+	if( file == NULL ) {
+		return NULL;
+	}
 	struct Hashes* result = malloc(sizeof(struct Hashes));
 	if (result == NULL) {
 		return NULL;
