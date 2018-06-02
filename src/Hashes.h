@@ -2,6 +2,7 @@
 #define HASHES_H_
 
 #include <stdio.h>
+#include <sys/types.h>
 
 #include "URIAcquire.h"
 
