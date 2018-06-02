@@ -28,6 +28,7 @@ find_package(UriParser REQUIRED)
 include_directories(${URIPARSER_INCLUDE_DIR})
 target_link_libraries(swift ${URIPARSER_LIBRARY})
 
+set(VALGRIND_COMMAND_OPTIONS "--error-exitcode=1 -q --tool=memcheck --leak-check=yes --show-reachable=yes")
 include (CTest)
 enable_testing()
 
