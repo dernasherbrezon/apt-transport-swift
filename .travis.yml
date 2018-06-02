@@ -11,10 +11,12 @@ addons:
     - libjson-c-dev
     - liburiparser-dev
     - valgrind
+    - check
     - make
     - cmake
 
 script:
+  - set -e
   - mkdir debug && cd debug
   - cmake -DCMAKE_BUILD_TYPE=Debug ..
   - make 

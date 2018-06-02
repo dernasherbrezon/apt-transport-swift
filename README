@@ -1,12 +1,12 @@
 About
-------
+=======
 
 Additional "swift" protocol for apt so you can host your giant apt repository in Openstack swift
 
 apt is a great packaging system and Openstack swift is a great place to backup/store static files.  apt-swift is especially useful and fast if you are hosting your servers within Openstack.
 
 Compile
-----
+=======
 
 
 	mkdir build && cd build
@@ -18,7 +18,7 @@ Compile
 Once compiled, the resulting swift binary must be placed in /usr/lib/apt/methods/ along with the other protocol binaries.
 
 Configuration
--------------
+=======
 
 This is how you add it to the /etc/apt/sources.list file:
 
