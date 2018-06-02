@@ -41,7 +41,7 @@ void swift_response(const struct URIAcquire* request, const struct Hashes* hashe
 	fprintf(stdout, "201 URI Done\n");
 	fprintf(stdout, "URI: %s\n", request->uri);
 	fprintf(stdout, "Filename: %s\n", request->filename);
-	fprintf(stdout, "Size: %llu\n", hashes->fileSize);
+	fprintf(stdout, "Size: %llu\n", ((unsigned long long)hashes->fileSize));
 	if (hashes->md5 != NULL) {
 		fprintf(stdout, "MD5-Hash: %s\n", hashes->md5);
 		fprintf(stdout, "MD5Sum-Hash: %s\n", hashes->md5);
@@ -55,7 +55,7 @@ void swift_response(const struct URIAcquire* request, const struct Hashes* hashe
 	if (hashes->sha512 != NULL) {
 		fprintf(stdout, "SHA512-Hash: %s\n", hashes->sha512);
 	}
-	fprintf(stdout, "Checksum-FileSize-Hash: %llu\n", hashes->fileSize);
+	fprintf(stdout, "Checksum-FileSize-Hash: %llu\n", ((unsigned long long)hashes->fileSize));
 }
 
 static size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream) {
