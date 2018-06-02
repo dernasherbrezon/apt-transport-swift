@@ -7,6 +7,7 @@ file(GLOB SOURCES src/*.c)
 list(REMOVE_ITEM SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/main.c")
 
 add_executable(swift src/main.c)
+set_property(TARGET swift PROPERTY C_STANDARD 99)
 
 add_library(swiftlib ${SOURCES})
 target_link_libraries(swift swiftlib)
@@ -44,13 +45,9 @@ foreach(curTest ${TEST_SOURCES})
 	get_filename_component(curTestName ${curTest} NAME_WE)
 	add_test(NAME ${curTestName} COMMAND ${curTestName} ${curTest})
 	add_executable(${curTestName} ${curTest})
+	set_property(TARGET ${curTestName} PROPERTY C_STANDARD 99)
 	if(LIBRT)
 		target_link_libraries(${curTestName} rt)
 	endif()
 	target_link_libraries(${curTestName} swiftlib ${CMAKE_THREAD_LIBS_INIT} ${CURL_LIBRARIES} ${OPENSSL_SSL_LIBRARY} ${OPENSSL_CRYPTO_LIBRARY} ${JSON-C_LIBRARIES} ${URIPARSER_LIBRARY} ${CHECK_LIBRARIES})
 endforeach()
-
-add_custom_target(test_memcheck
-    COMMAND ${CMAKE_CTEST_COMMAND} 
-        --force-new-ctest-process --test-action memcheck
-    COMMAND cat "${CTEST_MEMORYCHECK_SUPPRESSIONS_FILE}")
