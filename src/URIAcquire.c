@@ -1,5 +1,4 @@
 #include <stdlib.h>
-#define _GNU_SOURCE
 #include <stdio.h>
 #include <sys/types.h>
 #include <uriparser/Uri.h>

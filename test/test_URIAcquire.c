@@ -9,7 +9,7 @@ START_TEST (test_readmessage) {
 	ck_assert(fp != NULL);
 	struct URIAcquire* message = swift_uri_acquire_read(fp);
 	fclose(fp);
-	ck_assert(message);
+	ck_assert_ptr_nonnull(message);
 	ck_assert(message->expectedMd5 == false);
 	ck_assert(message->expectedSha1 == true);
 	ck_assert(message->expectedSha256 == false);

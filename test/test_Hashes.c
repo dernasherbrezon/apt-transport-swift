@@ -15,9 +15,9 @@ START_TEST (test_md5Only) {
 
 	struct Hashes* hashes = swift_hash_file(&req, fp);
 	ck_assert_str_eq(hashes->md5, "26e078b87fdaa3206ab8bf63a6096c07");
-	ck_assert(hashes->sha1 == NULL);
-	ck_assert(hashes->sha256 == NULL);
-	ck_assert(hashes->sha512 == NULL);
+	ck_assert_ptr_null(hashes->sha1);
+	ck_assert_ptr_null(hashes->sha256);
+	ck_assert_ptr_null(hashes->sha512);
 	ck_assert_int_eq(hashes->fileSize, 11);
 }
 END_TEST
