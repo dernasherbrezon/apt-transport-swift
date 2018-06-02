@@ -11,7 +11,7 @@ START_TEST (test_readmessage) {
 	fclose(fp);
 	ck_assert(message != NULL);
 	ck_assert_str_eq(message->proxyHostPort, "https://username:password@host:8080");
-	ck_assert(message->containers);
+	ck_assert(message->containers != NULL);
 	ck_assert_int_eq(message->containers->count, 2);
 
 	struct ContainerConfiguration *value1 = swift_configuration_find_by_container(message, "test0");
