@@ -3,7 +3,9 @@
 #include "../src/common.h"
 
 START_TEST (test_cutPrefix) {
-	ck_assert_str_eq(cutPrefix("Config-Item: Acquire", "Config-Item: "), "Acquire");
+	char *result = cutPrefix("Config-Item: Acquire", "Config-Item: ");
+	ck_assert_str_eq(result, "Acquire");
+	free(result);
 }
 END_TEST
 
@@ -13,8 +15,11 @@ START_TEST (test_startsWith) {
 END_TEST
 
 void assertTrim(const char *str, const char* expected) {
-	char *mutable = (char*) malloc(strlen(str));
-	ck_assert_str_eq(trim(strcpy(mutable, str)), expected);
+	size_t len = strlen(str);
+	char *mutable = malloc(len + 1);
+	strcpy(mutable, str);
+	mutable[len] = '\0';
+	ck_assert_str_eq(trim(mutable), expected);
 	free(mutable);
 }
 
@@ -56,6 +61,7 @@ int main(void) {
 	s = common_suite();
 	sr = srunner_create(s);
 
+	srunner_set_fork_status(sr, CK_NOFORK);
 	srunner_run_all(sr, CK_NORMAL);
 	number_failed = srunner_ntests_failed(sr);
 	srunner_free(sr);
