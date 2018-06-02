@@ -64,11 +64,15 @@ struct Configuration* swift_configuration_read(FILE* source) {
 	result->verbose = false;
 	while (true) {
 		if ((readBytes = getline(&line, &len, source)) == -1 || (strcmp(line, "\n") == 0)) {
+			free(line);
+			line = NULL;
 			break;
 		}
 		char *fullUrl = cutPrefix(line, "Config-Item: Acquire::https::Proxy=");
 		if (fullUrl != NULL) {
 			result->proxyHostPort = fullUrl;
+			free(line);
+			line = NULL;
 			continue;
 		}
 		char *container = cutPrefix(line, "Config-Item: Swift::Container");
@@ -78,12 +82,16 @@ struct Configuration* swift_configuration_read(FILE* source) {
 			if (pch == NULL) {
 				fprintf(stderr, "invalid format: %s\n", container);
 				free(container);
+				free(line);
+				line = NULL;
 				continue;
 			}
 			struct ContainerConfiguration * config = swift_configuration_find_by_id(result->containers, pch);
 			if (config == NULL) {
 				config = malloc(sizeof(struct ContainerConfiguration));
 				if (config == NULL) {
+					free(line);
+					line = NULL;
 					break;
 				}
 				config->id = strdup(pch);
@@ -94,48 +102,65 @@ struct Configuration* swift_configuration_read(FILE* source) {
 				if (!push_back(&result->containers, config)) {
 					free(config);
 					free(container);
+					free(line);
+					line = NULL;
 					break;
 				}
 			}
-			pch = strdup(strtok(NULL, "="));
+			pch = strtok(NULL, "=");
 			if (pch == NULL) {
 				fprintf(stderr, "invalid format: %s\n", container);
 				free(container);
+				free(line);
+				line = NULL;
 				continue;
 			}
 			char *value = strdup(strtok(NULL, "="));
 			if (value == NULL) {
 				fprintf(stderr, "invalid format: %s\n", container);
 				free(container);
+				free(line);
+				line = NULL;
 				continue;
 			}
 			if (strcmp(pch, ":Name") == 0) {
 				config->container = value;
 				free(container);
+				free(line);
+				line = NULL;
 				continue;
 			}
 			if (strcmp(pch, ":Username") == 0) {
 				config->username = value;
 				free(container);
+				free(line);
+				line = NULL;
 				continue;
 			}
 			if (strcmp(pch, ":Password") == 0) {
 				config->password = value;
 				free(container);
+				free(line);
+				line = NULL;
 				continue;
 			}
 			if (strcmp(pch, ":URL") == 0) {
 				config->url = value;
 				free(container);
+				free(line);
+				line = NULL;
 				continue;
 			}
 			continue;
 		}
 		if (strcmp(trim(line), "Config-Item: Debug::Acquire::https=true") == 0) {
 			result->verbose = true;
+			free(line);
+			line = NULL;
 			continue;
 		}
-
+		free(line);
+		line = NULL;
 	}
 	// do not support anonymous explicitly
 	// use plain https/http transport for anonymous access
