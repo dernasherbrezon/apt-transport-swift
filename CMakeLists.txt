@@ -27,6 +27,7 @@ find_package(UriParser REQUIRED)
 include_directories(${URIPARSER_INCLUDE_DIR})
 target_link_libraries(swift ${URIPARSER_LIBRARY})
 
+include (CTest)
 enable_testing()
 
 file(GLOB TEST_SOURCES test/test_*.c)
@@ -48,3 +49,8 @@ foreach(curTest ${TEST_SOURCES})
 	endif()
 	target_link_libraries(${curTestName} swiftlib ${CMAKE_THREAD_LIBS_INIT} ${CURL_LIBRARIES} ${OPENSSL_SSL_LIBRARY} ${OPENSSL_CRYPTO_LIBRARY} ${JSON-C_LIBRARIES} ${URIPARSER_LIBRARY} ${CHECK_LIBRARIES})
 endforeach()
+
+add_custom_target(test_memcheck
+    COMMAND ${CMAKE_CTEST_COMMAND} 
+        --force-new-ctest-process --test-action memcheck
+    COMMAND cat "${CTEST_MEMORYCHECK_SUPPRESSIONS_FILE}")

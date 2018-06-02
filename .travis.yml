@@ -1,0 +1,25 @@
+language: c
+
+compiler:
+  - gcc
+
+addons:
+  apt:
+    packages:
+    - libssl-dev
+    - libcurl4-gnutls-dev
+    - libjson-c-dev
+    - liburiparser-dev
+    - valgrind
+    - make
+    - cmake
+
+script:
+  - mkdir debug && cd debug
+  - cmake -DCMAKE_BUILD_TYPE=Debug ..
+  - make 
+  - ctest -T memcheck
+  - cd ..
+  - mkdir release && cd release
+  - cmake ..
+  - make
