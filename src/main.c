@@ -12,6 +12,7 @@
 #include "Hashes.h"
 #include "URIAcquire.h"
 #include "Configuration.h"
+#include "SwiftClient.h"
 
 void swift_requestCapabilities() {
 	fprintf(stdout, "100 Capabilities\n");
@@ -44,7 +45,7 @@ void swift_response(const struct URIAcquire* request, const struct Hashes* hashe
 	fprintf(stdout, "201 URI Done\n");
 	fprintf(stdout, "URI: %s\n", request->uri);
 	fprintf(stdout, "Filename: %s\n", request->filename);
-	fprintf(stdout, "Size: %llu\n", ((unsigned long long)hashes->fileSize));
+	fprintf(stdout, "Size: %llu\n", ((unsigned long long) hashes->fileSize));
 	if (hashes->md5 != NULL) {
 		fprintf(stdout, "MD5-Hash: %s\n", hashes->md5);
 		fprintf(stdout, "MD5Sum-Hash: %s\n", hashes->md5);
@@ -58,25 +59,18 @@ void swift_response(const struct URIAcquire* request, const struct Hashes* hashe
 	if (hashes->sha512 != NULL) {
 		fprintf(stdout, "SHA512-Hash: %s\n", hashes->sha512);
 	}
-	fprintf(stdout, "Checksum-FileSize-Hash: %llu\n", ((unsigned long long)hashes->fileSize));
-}
-
-static size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream) {
-	size_t written = fwrite(ptr, size, nmemb, (FILE *) stream);
-	return written;
+	fprintf(stdout, "Checksum-FileSize-Hash: %llu\n", ((unsigned long long) hashes->fileSize));
 }
 
 int main(void) {
 
-	CURL *curl = NULL;
-
 	swift_requestCapabilities();
 
+	struct SwiftClients *clients = NULL;
+	struct Configuration *configuration = NULL;
 	char *line = NULL;
 	size_t len = 0;
 	ssize_t readBytes;
-
-	struct Configuration *configuration = NULL;
 
 	while (true) {
 		free(line);
@@ -88,6 +82,7 @@ int main(void) {
 			configuration = swift_configuration_read(stdin);
 			if (configuration == NULL) {
 				//unable to parse configuration. this is critical
+				//FIXME output error into stdout
 				break;
 			}
 			continue;
@@ -95,54 +90,50 @@ int main(void) {
 		if (startsWith(line, "600")) {
 			struct URIAcquire* message = swift_uri_acquire_read(stdin);
 			if (message == NULL || configuration == NULL) {
+				//FIXME output error into stdout
 				continue;
 			}
-			if (curl == NULL) {
+			if (clients == NULL) {
 				curl_global_init(CURL_GLOBAL_DEFAULT);
-				curl = curl_easy_init();
-				if (!curl) {
+			}
+			struct SwiftClient *client = swift_client_find(&clients, message->container);
+			if (client == NULL) {
+				client = swift_client_create(&clients, message->container);
+				if (client == NULL) {
 					swift_uri_acquire_free(message);
+					//FIXME output error into stdout
+					break;
+				}
+				struct ContainerConfiguration *containerConfig = swift_configuration_find_by_container(configuration, message->container);
+				if( containerConfig == NULL ) {
+					swift_uri_acquire_free(message);
+					//FIXME output error
+					continue;
+				}
+				if (!swift_client_authenticate(client, containerConfig)) {
+					swift_uri_acquire_free(message);
+					//FIXME output error into stdout
 					break;
 				}
 			}
 
-			curl_easy_setopt(curl, CURLOPT_URL, message->uri);
-			if (configuration->verbose) {
-				curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
-			}
-			curl_easy_setopt(curl, CURLOPT_USERAGENT, "apt-transport-swift");
-			curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
-			if (configuration->proxyHostPort != NULL) {
-				curl_easy_setopt(curl, CURLOPT_PROXY, configuration->proxyHostPort);
-			}
-			FILE *pagefile = fopen(message->filename, "wb");
-			if (!pagefile) {
-				swift_responseError(message->uri, "unable to write file");
-				swift_uri_acquire_free(message);
-				continue;
-			}
-			curl_easy_setopt(curl, CURLOPT_WRITEDATA, pagefile);
-			CURLcode res = curl_easy_perform(curl);
-			fclose(pagefile);
-			if (res != CURLE_OK) {
-				swift_responseError(message->uri, curl_easy_strerror(res));
-				swift_uri_acquire_free(message);
-				continue;
-			}
-			long response_code;
-			curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
-			if (response_code == 304) {
+			struct SwiftResponse *response = swift_client_download(client, message->path, message->filename);
+			if (response->response_code == 304) {
 				swift_not_modified(message);
 				swift_uri_acquire_free(message);
+				swift_client_response_free(response);
 				continue;
 			}
-			if (response_code != 200) {
-				swift_responseError(message->uri, "invalid response code");
+			if (response->response_code != 200) {
+				swift_responseError(message->uri, response->response_message);
 				swift_uri_acquire_free(message);
+				swift_client_response_free(response);
 				continue;
 			}
 
-			pagefile = fopen(message->filename, "rb");
+			swift_client_response_free(response);
+
+			FILE *pagefile = fopen(message->filename, "rb");
 			struct Hashes* hashes = swift_hash_file(message, pagefile);
 			fclose(pagefile);
 			if (hashes == NULL) {
@@ -159,7 +150,7 @@ int main(void) {
 	line = NULL;
 
 	swift_configuration_free(configuration);
+	swift_client_clients_free(clients);
 
-	curl_easy_cleanup(curl);
 	return EXIT_SUCCESS;
 }

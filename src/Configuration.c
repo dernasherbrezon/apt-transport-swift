@@ -9,7 +9,7 @@
 #include "common.h"
 #include "Configuration.h"
 
-bool push_back(struct ListOfConfigurations **fubar, struct ContainerConfiguration* value) {
+bool swift_configuration_push_back(struct ListOfConfigurations **fubar, struct ContainerConfiguration* value) {
 	size_t x = *fubar ? fubar[0]->count : 0, y = x + 1;
 
 	if ((x & y) == 0) {
@@ -93,7 +93,7 @@ struct Configuration* swift_configuration_read(FILE* source) {
 				config->password = NULL;
 				config->url = NULL;
 				config->username = NULL;
-				if (!push_back(&result->containers, config)) {
+				if (!swift_configuration_push_back(&result->containers, config)) {
 					free(config);
 					free(container);
 					break;
