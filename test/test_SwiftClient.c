@@ -2,14 +2,20 @@
 #include <check.h>
 
 #include "../src/SwiftClient.h"
+#include "../src/Configuration.h"
 
 START_TEST (test_init) {
 	curl_global_init(CURL_GLOBAL_DEFAULT);
 	struct SwiftClients *clients = NULL;
-	struct SwiftClient* client = swift_client_create(&clients, "test");
+	struct Configuration *config = malloc(sizeof(struct Configuration));
+	config->verbose = false;
+	config->proxyHostPort = NULL;
+	config->containers = NULL;
+	struct SwiftClient* client = swift_client_create(&clients, "test", config);
 	ck_assert(clients != NULL);
 	ck_assert(client != NULL);
 	swift_client_clients_free(clients);
+	swift_configuration_free(config);
 }
 END_TEST
 

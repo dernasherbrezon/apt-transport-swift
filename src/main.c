@@ -98,19 +98,20 @@ int main(void) {
 			}
 			struct SwiftClient *client = swift_client_find(&clients, message->container);
 			if (client == NULL) {
-				client = swift_client_create(&clients, message->container);
+				client = swift_client_create(&clients, message->container, configuration);
 				if (client == NULL) {
 					swift_uri_acquire_free(message);
 					//FIXME output error into stdout
 					break;
 				}
 				struct ContainerConfiguration *containerConfig = swift_configuration_find_by_container(configuration, message->container);
-				if( containerConfig == NULL ) {
+				if (containerConfig == NULL) {
 					swift_uri_acquire_free(message);
 					//FIXME output error
 					continue;
 				}
-				if (!swift_client_authenticate(client, containerConfig)) {
+				char *errorResponse = swift_client_authenticate(client, containerConfig);
+				if (errorResponse != NULL) {
 					swift_uri_acquire_free(message);
 					//FIXME output error into stdout
 					break;
