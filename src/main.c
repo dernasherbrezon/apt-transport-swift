@@ -110,7 +110,7 @@ int main(void) {
 					//FIXME output error
 					continue;
 				}
-				char *errorResponse = swift_client_authenticate(client, containerConfig);
+				const char *errorResponse = swift_client_authenticate(client, containerConfig);
 				if (errorResponse != NULL) {
 					swift_uri_acquire_free(message);
 					//FIXME output error into stdout

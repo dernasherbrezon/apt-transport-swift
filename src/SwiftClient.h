@@ -25,7 +25,7 @@ struct SwiftClient* swift_client_find(struct SwiftClients **clients, char *conta
 
 struct SwiftClient* swift_client_create(struct SwiftClients **clients, char *container, struct Configuration *config);
 
-char* swift_client_authenticate(struct SwiftClient* client, struct ContainerConfiguration *configuration);
+const char* swift_client_authenticate(struct SwiftClient* client, struct ContainerConfiguration *configuration);
 
 struct SwiftResponse* swift_client_download(struct SwiftClient *client, char *path, char *filename);
 

@@ -38,9 +38,10 @@ static size_t swift_client_read_auth_request(void *dest, size_t size, size_t nme
 	return 0;
 }
 
-char * swift_client_authenticate(struct SwiftClient* client, struct ContainerConfiguration *configuration) {
+const char * swift_client_authenticate(struct SwiftClient* client, struct ContainerConfiguration *configuration) {
 	const char *path = "/v3/auth/tokens";
 	char *authUrl = malloc(sizeof(char) * (strlen(configuration->url) + strlen(path)));
+	strncpy(authUrl, configuration->url, strlen(configuration->url));
 	strcat(authUrl, path);
 	curl_easy_setopt(client->curl, CURLOPT_URL, authUrl);
 
