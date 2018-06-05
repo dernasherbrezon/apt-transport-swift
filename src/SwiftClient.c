@@ -41,27 +41,28 @@ const char * swift_client_authenticate(struct SwiftClient* client, struct Contai
 		return "unable to allocate memory";
 	}
 	strncpy(authUrl, configuration->url, strlen(configuration->url));
+	authUrl[strlen(configuration->url)] = '\0';
 	strcat(authUrl, path);
 	authUrl[length] = '\0';
 
 	curl_easy_setopt(client->curl, CURLOPT_URL, authUrl);
 
-	struct curl_slist *headers;
+	struct curl_slist *headers = NULL;
 	headers = curl_slist_append(headers, "Content-Type: application/json");
 	headers = curl_slist_append(headers, "Expect:");
 
 	const char *template = "{\"auth\":{\"identity\":{\"methods\":[\"password\"],\"password\":{\"user\":{\"name\": \"%s\",\"domain\":{\"name\":\"Default\"},\"password\":\"%s\"}}}}}";
 	size_t bodyLength = strlen(template) + strlen(configuration->username) + strlen(configuration->password);
-	char *body = malloc(sizeof(char) * (bodyLength + 1));
-	int allocatedBytes = snprintf(body, bodyLength, template, configuration->username, configuration->password);
+	char *requestBody = malloc(sizeof(char) * (bodyLength + 1));
+	int allocatedBytes = snprintf(requestBody, bodyLength, template, configuration->username, configuration->password);
 	if (allocatedBytes < 0) {
 		return "unable to allocate body";
 	}
-	body[bodyLength] = '\0';
+	requestBody[bodyLength] = '\0';
 
 	curl_easy_setopt(client->curl, CURLOPT_HTTPHEADER, headers);
 	curl_easy_setopt(client->curl, CURLOPT_READFUNCTION, swift_client_read_auth_request);
-	curl_easy_setopt(client->curl, CURLOPT_READDATA, body);
+	curl_easy_setopt(client->curl, CURLOPT_READDATA, requestBody);
 	curl_easy_setopt(client->curl, CURLOPT_POSTFIELDSIZE, allocatedBytes);
 	curl_easy_setopt(client->curl, CURLOPT_POST, 1);
 
@@ -84,11 +85,10 @@ const char * swift_client_authenticate(struct SwiftClient* client, struct Contai
 		return "Invalid response code";
 	}
 
-	printf("body: %s\n", response.body);
-
 	curl_slist_free_all(headers);
 	free(authUrl);
 	free(response.body);
+	free(requestBody);
 	return NULL;
 }
 

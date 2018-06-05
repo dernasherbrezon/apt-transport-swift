@@ -22,10 +22,17 @@ int main(int argc, char **argv) {
 	printf("url: %s\n", containerConfig->url);
 	printf("username: %s\n", containerConfig->username);
 
+	struct ListOfConfigurations *configs = malloc(sizeof(struct ListOfConfigurations) + 1 * sizeof(struct Configuration));
+	if (configs == NULL) {
+		return 1;
+	}
 	struct Configuration *config = malloc(sizeof(struct Configuration));
+	if (config == NULL) {
+		return 1;
+	}
 	config->verbose = true;
 	config->proxyHostPort = NULL;
-	config->containers = malloc(sizeof(struct ListOfConfigurations));
+	config->containers = configs;
 	config->containers->count = 1;
 	config->containers->value[0] = containerConfig;
 
