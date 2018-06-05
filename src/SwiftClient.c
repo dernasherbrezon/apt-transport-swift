@@ -5,23 +5,34 @@
 #include <stdio.h>
 #include <string.h>
 #include "SwiftClient.h"
+#include "common.h"
 
-struct AuthResponse {
-	char *body;
-};
+static size_t swift_client_read_auth_header(char *buffer, size_t size, size_t nitems, void *userdata) {
+	size_t length = size * nitems;
+	char *header = malloc(length + 1);
+	memcpy(header, buffer, length);
+	header[length] = '\0';
+	char *token = cutPrefix(header, "X-Subject-Token: ");
+	if (token != NULL) {
+		char **response = (char **) userdata;
+		*response = token;
+	}
+	free(header);
+	return length;
+}
 
 static size_t swift_client_read_auth_response(void *ptr, size_t size, size_t nmemb, void *userp) {
-	struct AuthResponse *wt = (struct AuthResponse *) userp;
+	char **wt = (char **) userp;
 	size_t newLength = 0;
 	size_t oldLength = 0;
-	if (wt->body != NULL) {
-		oldLength = strlen(wt->body);
+	if ((*wt) != NULL) {
+		oldLength = strlen(*wt);
 	}
 	newLength = oldLength + size * nmemb;
 
-	wt->body = realloc(wt->body, newLength + 1);
-	memcpy(wt->body + oldLength, ptr, size * nmemb);
-	wt->body[newLength] = '\0';
+	*wt = realloc(*wt, newLength + 1);
+	memcpy((*wt) + oldLength, ptr, size * nmemb);
+	(*wt)[newLength] = '\0';
 
 	return size * nmemb;
 }
@@ -37,7 +48,7 @@ const char * swift_client_authenticate(struct SwiftClient* client, struct Contai
 	const char *path = "/v3/auth/tokens";
 	size_t length = (strlen(configuration->url) + strlen(path));
 	char *authUrl = malloc(length + 1);
-	if( authUrl == NULL ) {
+	if (authUrl == NULL) {
 		return "unable to allocate memory";
 	}
 	strncpy(authUrl, configuration->url, strlen(configuration->url));
@@ -66,16 +77,19 @@ const char * swift_client_authenticate(struct SwiftClient* client, struct Contai
 	curl_easy_setopt(client->curl, CURLOPT_POSTFIELDSIZE, allocatedBytes);
 	curl_easy_setopt(client->curl, CURLOPT_POST, 1);
 
-	struct AuthResponse response;
-	response.body = NULL;
+	char *responseBody = NULL;
 
 	curl_easy_setopt(client->curl, CURLOPT_WRITEFUNCTION, swift_client_read_auth_response);
-	curl_easy_setopt(client->curl, CURLOPT_WRITEDATA, &response);
+	curl_easy_setopt(client->curl, CURLOPT_WRITEDATA, &responseBody);
+
+	char *token = NULL;
+	curl_easy_setopt(client->curl, CURLOPT_HEADERFUNCTION, swift_client_read_auth_header);
+	curl_easy_setopt(client->curl, CURLOPT_HEADERDATA, &token);
 
 	CURLcode res = curl_easy_perform(client->curl);
 
 	if (res != CURLE_OK) {
-		free(response.body);
+		free(responseBody);
 		return curl_easy_strerror(res);
 	}
 
@@ -85,9 +99,11 @@ const char * swift_client_authenticate(struct SwiftClient* client, struct Contai
 		return "Invalid response code";
 	}
 
+	client->token = token;
+
 	curl_slist_free_all(headers);
 	free(authUrl);
-	free(response.body);
+	free(responseBody);
 	free(requestBody);
 	return NULL;
 }
@@ -133,6 +149,7 @@ void swift_client_client_free(struct SwiftClient *client) {
 	free(client->container);
 	curl_easy_cleanup(client->curl);
 	free(client->token);
+	free(client->endpointUrl);
 	free(client);
 }
 
@@ -159,6 +176,7 @@ struct SwiftClient* swift_client_create(struct SwiftClients **clients, char *con
 	result->container = strdup(container);
 	result->curl = curl;
 	result->token = NULL;
+	result->endpointUrl = NULL;
 	if (!swift_client_push_back(clients, result)) {
 		swift_client_client_free(result);
 		return NULL;

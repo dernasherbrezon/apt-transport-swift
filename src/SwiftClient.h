@@ -9,6 +9,7 @@ struct SwiftClient {
 	CURL *curl;
 	char *token;
 	char *container;
+	char *endpointUrl; //differs from baseUrl. Example: https://api.selcdn.ru/v1/account.
 };
 
 struct SwiftClients {
