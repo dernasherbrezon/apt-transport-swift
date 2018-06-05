@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <json-c/json.h>
+
 #include "SwiftClient.h"
 #include "common.h"
 
@@ -52,6 +54,48 @@ static size_t swift_client_read_auth_request(void *dest, size_t size, size_t nme
 	return allocatedBytes;
 }
 
+char* swift_client_extract_endpoint(char *body) {
+	json_object *obj;
+	obj = json_tokener_parse(body);
+	json_object *token;
+	if (!json_object_object_get_ex(obj, "token", &token)) {
+		json_object_put(obj);
+		return NULL;
+	}
+	json_object *catalog;
+	if (!json_object_object_get_ex(token, "catalog", &catalog)) {
+		json_object_put(obj);
+		return NULL;
+	}
+	json_object *first = json_object_array_get_idx(catalog, 0);
+	if (first == NULL) {
+		json_object_put(obj);
+		return NULL;
+	}
+	json_object *endpoints;
+	if (!json_object_object_get_ex(first, "endpoints", &endpoints)) {
+		json_object_put(obj);
+		return NULL;
+	}
+	array_list *list = json_object_get_array(endpoints);
+	for (int i = 0; i < list->length; i++) {
+		json_object *cur = json_object_array_get_idx(endpoints, i);
+		json_object *interface;
+		json_object_object_get_ex(cur, "interface", &interface);
+		if (strcmp(json_object_get_string(interface), "public") == 0) {
+			json_object *url;
+			if (!json_object_object_get_ex(cur, "url", &url)) {
+				continue;
+			}
+			char *result = strdup(json_object_get_string(url));
+			json_object_put(obj);
+			return result;
+		}
+	}
+	json_object_put(obj);
+	return NULL;
+}
+
 const char * swift_client_authenticate(struct SwiftClient* client, struct ContainerConfiguration *configuration) {
 	const char *path = "/v3/auth/tokens";
 	size_t length = (strlen(configuration->url) + strlen(path));
@@ -73,7 +117,7 @@ const char * swift_client_authenticate(struct SwiftClient* client, struct Contai
 	const char *template = "{\"auth\":{\"identity\":{\"methods\":[\"password\"],\"password\":{\"user\":{\"name\": \"%s\",\"domain\":{\"name\":\"Default\"},\"password\":\"%s\"}}}}}";
 	size_t requestLength = strlen(template) + strlen(configuration->username) + strlen(configuration->password);
 	char *requestBody = malloc(sizeof(char) * (requestLength + 1));
-	if( requestBody == NULL ) {
+	if (requestBody == NULL) {
 		return "unable to allocate body";
 	}
 	int allocatedBytes = snprintf(requestBody, requestLength, template, configuration->username, configuration->password);
@@ -98,21 +142,29 @@ const char * swift_client_authenticate(struct SwiftClient* client, struct Contai
 
 	if (res != CURLE_OK) {
 		free(responseBody);
+		free(token);
 		return curl_easy_strerror(res);
 	}
 
 	long response_code;
 	curl_easy_getinfo(client->curl, CURLINFO_RESPONSE_CODE, &response_code);
 	if (response_code != 201) {
+		free(responseBody);
+		free(token);
 		return "Invalid response code";
 	}
 
+	client->endpointUrl = swift_client_extract_endpoint(responseBody);
 	client->token = token;
 
 	curl_slist_free_all(headers);
 	free(authUrl);
 	free(responseBody);
 	free(requestBody);
+
+	if (client->endpointUrl == NULL || client->token == NULL) {
+		return "unable to authenticate";
+	}
 	return NULL;
 }
 

@@ -22,7 +22,7 @@ target_link_libraries(swift ${CURL_LIBRARIES})
 
 find_package(JSON-C REQUIRED)
 include_directories(${JSON-C_INCLUDE_DIRS})
-target_link_libraries(swift ${JSON-C_LIBRARIES} uriparser)
+target_link_libraries(swift ${JSON-C_LIBRARIES})
 
 find_package(UriParser REQUIRED)
 include_directories(${URIPARSER_INCLUDE_DIR})

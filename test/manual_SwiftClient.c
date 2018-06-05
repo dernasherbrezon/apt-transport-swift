@@ -43,6 +43,9 @@ int main(int argc, char **argv) {
 		printf("result: %s\n", response);
 	}
 
+	printf("token: %s\n", client->token);
+	printf("endpoint: %s\n", client->endpointUrl);
+
 	swift_configuration_free(config);
 	swift_client_clients_free(clients);
 
