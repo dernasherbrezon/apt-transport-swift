@@ -10,6 +10,10 @@
 static size_t swift_client_read_auth_header(char *buffer, size_t size, size_t nitems, void *userdata) {
 	size_t length = size * nitems;
 	char *header = malloc(length + 1);
+	if (header == NULL) {
+		//can't do much
+		return length;
+	}
 	memcpy(header, buffer, length);
 	header[length] = '\0';
 	char *token = cutPrefix(header, "X-Subject-Token: ");
@@ -31,6 +35,10 @@ static size_t swift_client_read_auth_response(void *ptr, size_t size, size_t nme
 	newLength = oldLength + size * nmemb;
 
 	*wt = realloc(*wt, newLength + 1);
+	if (*wt == NULL) {
+		//can't do much
+		return size * nmemb;
+	}
 	memcpy((*wt) + oldLength, ptr, size * nmemb);
 	(*wt)[newLength] = '\0';
 
@@ -63,13 +71,13 @@ const char * swift_client_authenticate(struct SwiftClient* client, struct Contai
 	headers = curl_slist_append(headers, "Expect:");
 
 	const char *template = "{\"auth\":{\"identity\":{\"methods\":[\"password\"],\"password\":{\"user\":{\"name\": \"%s\",\"domain\":{\"name\":\"Default\"},\"password\":\"%s\"}}}}}";
-	size_t bodyLength = strlen(template) + strlen(configuration->username) + strlen(configuration->password);
-	char *requestBody = malloc(sizeof(char) * (bodyLength + 1));
-	int allocatedBytes = snprintf(requestBody, bodyLength, template, configuration->username, configuration->password);
-	if (allocatedBytes < 0) {
+	size_t requestLength = strlen(template) + strlen(configuration->username) + strlen(configuration->password);
+	char *requestBody = malloc(sizeof(char) * (requestLength + 1));
+	if( requestBody == NULL ) {
 		return "unable to allocate body";
 	}
-	requestBody[bodyLength] = '\0';
+	int allocatedBytes = snprintf(requestBody, requestLength, template, configuration->username, configuration->password);
+	requestBody[requestLength] = '\0';
 
 	curl_easy_setopt(client->curl, CURLOPT_HTTPHEADER, headers);
 	curl_easy_setopt(client->curl, CURLOPT_READFUNCTION, swift_client_read_auth_request);
