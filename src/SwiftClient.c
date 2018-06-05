@@ -6,11 +6,6 @@ struct AuthResponse {
 	char *body;
 };
 
-static size_t swift_client_write_data(void *ptr, size_t size, size_t nmemb, void *stream) {
-	size_t written = fwrite(ptr, size, nmemb, (FILE *) stream);
-	return written;
-}
-
 static size_t swift_client_read_auth_response(void *ptr, size_t size, size_t nmemb, void *userp) {
 	struct AuthResponse *wt = (struct AuthResponse *) userp;
 	size_t newLength = 0;
@@ -28,14 +23,10 @@ static size_t swift_client_read_auth_response(void *ptr, size_t size, size_t nme
 }
 
 static size_t swift_client_read_auth_request(void *dest, size_t size, size_t nmemb, void *userp) {
-	struct ContainerConfiguration *wt = (struct ContainerConfiguration *) userp;
-	char *body = NULL;
-	int allocatedBytes = asprintf(&body, "{\"auth\":{\"identity\":{\"methods\":[\"password\"],\"password\":{\"user\":{\"name\": \"%s\",\"domain\":{\"name\":\"Default\"},\"password\":\"%s\"}}}}}", wt->username, wt->password);
-	if (allocatedBytes < 0) {
-		return 0;
-	}
+	char *body = (char*) userp;
+	int allocatedBytes = (sizeof(char) * strlen(body));
 	memcpy(dest, body, allocatedBytes);
-	return 0;
+	return allocatedBytes;
 }
 
 const char * swift_client_authenticate(struct SwiftClient* client, struct ContainerConfiguration *configuration) {
@@ -47,10 +38,19 @@ const char * swift_client_authenticate(struct SwiftClient* client, struct Contai
 
 	struct curl_slist *headers;
 	headers = curl_slist_append(headers, "Content-Type: application/json");
+	headers = curl_slist_append(headers, "Expect:");
+
+	char *body = NULL;
+	int allocatedBytes = asprintf(&body, "{\"auth\":{\"identity\":{\"methods\":[\"password\"],\"password\":{\"user\":{\"name\": \"%s\",\"domain\":{\"name\":\"Default\"},\"password\":\"%s\"}}}}}", configuration->username, configuration->password);
+	if (allocatedBytes < 0) {
+		return "unable to allocate body";
+	}
+
 	curl_easy_setopt(client->curl, CURLOPT_HTTPHEADER, headers);
-	curl_easy_setopt(client->curl, CURLOPT_POST, 1);
 	curl_easy_setopt(client->curl, CURLOPT_READFUNCTION, swift_client_read_auth_request);
-	curl_easy_setopt(client->curl, CURLOPT_READDATA, configuration);
+	curl_easy_setopt(client->curl, CURLOPT_READDATA, body);
+	curl_easy_setopt(client->curl, CURLOPT_POSTFIELDSIZE, allocatedBytes);
+	curl_easy_setopt(client->curl, CURLOPT_POST, 1);
 
 	struct AuthResponse response;
 	response.body = NULL;
@@ -59,9 +59,6 @@ const char * swift_client_authenticate(struct SwiftClient* client, struct Contai
 	curl_easy_setopt(client->curl, CURLOPT_WRITEDATA, &response);
 
 	CURLcode res = curl_easy_perform(client->curl);
-
-	free(headers);
-	free(authUrl);
 
 	if (res != CURLE_OK) {
 		free(response.body);
@@ -74,8 +71,8 @@ const char * swift_client_authenticate(struct SwiftClient* client, struct Contai
 		return "Invalid response code";
 	}
 
-	printf("response: %s", response.body);
-
+	curl_slist_free_all(headers);
+	free(authUrl);
 	free(response.body);
 	return NULL;
 }
@@ -134,13 +131,14 @@ struct SwiftClient* swift_client_create(struct SwiftClients **clients, char *con
 		curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
 	}
 	curl_easy_setopt(curl, CURLOPT_USERAGENT, "apt-transport-swift");
-	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, swift_client_write_data);
+//	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, swift_client_write_data);
 	if (config->proxyHostPort != NULL) {
 		curl_easy_setopt(curl, CURLOPT_PROXY, config->proxyHostPort);
 	}
 
 	struct SwiftClient *result = malloc(sizeof(struct SwiftClient));
 	if (result == NULL) {
+		curl_easy_cleanup(curl);
 		return NULL;
 	}
 	result->container = strdup(container);
