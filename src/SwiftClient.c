@@ -168,8 +168,82 @@ const char * swift_client_authenticate(struct SwiftClient* client, struct Contai
 	return NULL;
 }
 
-struct SwiftResponse* swift_client_download(struct SwiftClient *client, char *path, char *filename) {
-	//FIXME
+struct SwiftResponse* swift_client_download(struct SwiftClient *client, struct URIAcquire* message) {
+
+	struct SwiftResponse* result = malloc(sizeof(struct SwiftResponse));
+	if (result == NULL) {
+		return NULL;
+	}
+
+	FILE *pagefile = fopen(message->filename, "wb");
+	if (!pagefile) {
+		result->response_code = 503;
+		result->response_message = strdup("unable to open file for write");
+		return result;
+	}
+
+	size_t length = (strlen(client->endpointUrl) + strlen(message->path));
+	char *requestUrl = malloc(length + 1);
+	if (requestUrl == NULL) {
+		result->response_code = 503;
+		result->response_message = strdup("unable to allocate memory");
+		return result;
+	}
+	strncpy(requestUrl, client->endpointUrl, strlen(client->endpointUrl));
+	requestUrl[strlen(client->endpointUrl)] = '\0';
+	strcat(requestUrl, message->path);
+	requestUrl[length] = '\0';
+
+	curl_easy_setopt(client->curl, CURLOPT_URL, requestUrl);
+
+	const char *tokenHeader = "X-Auth-Token: ";
+	size_t tokenHeaderLength = strlen(tokenHeader) + strlen(client->token);
+	char *token = malloc(tokenHeaderLength + 1);
+	if (token == NULL) {
+		result->response_code = 503;
+		result->response_message = strdup("unable to allocate memory");
+		return result;
+	}
+	strncpy(token, tokenHeader, strlen(tokenHeader));
+	token[strlen(tokenHeader)] = '\0';
+	strcat(token, client->token);
+	token[tokenHeaderLength] = '\0';
+	struct curl_slist *headers = NULL;
+	headers = curl_slist_append(headers, token);
+
+	char *lastModifiedHeader = NULL;
+	if (message->lastModified != NULL) {
+		const char *lastModifiedHeader = "If-Modified-Since: ";
+		size_t lastModifiedHeaderLength = strlen(lastModifiedHeader) + strlen(message->lastModified);
+		char *lastModified = malloc(lastModifiedHeaderLength + 1);
+		if (lastModified == NULL) {
+			result->response_code = 503;
+			result->response_message = strdup("unable to allocate memory");
+			return result;
+		}
+		strncpy(lastModified, lastModifiedHeader, strlen(lastModifiedHeader));
+		lastModified[strlen(lastModifiedHeader)] = '\0';
+		strcat(lastModified, message->lastModified);
+		lastModified[lastModifiedHeaderLength] = '\0';
+
+		headers = curl_slist_append(headers, lastModified);
+	}
+
+	curl_easy_setopt(client->curl, CURLOPT_HTTPHEADER, headers);
+	curl_easy_setopt(client->curl, CURLOPT_WRITEDATA, pagefile);
+
+	CURLcode res = curl_easy_perform(client->curl);
+	fclose(pagefile);
+	if (res != CURLE_OK) {
+		result->response_code = 503;
+		result->response_message = strdup(curl_easy_strerror(res));
+	} else {
+		long response_code;
+		curl_easy_getinfo(client->curl, CURLINFO_RESPONSE_CODE, &response_code);
+		result->response_code = response_code;
+	}
+	free(token);
+	free(lastModifiedHeader);
 	return NULL;
 }
 

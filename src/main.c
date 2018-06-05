@@ -118,7 +118,12 @@ int main(void) {
 				}
 			}
 
-			struct SwiftResponse *response = swift_client_download(client, message->path, message->filename);
+			struct SwiftResponse *response = swift_client_download(client, message);
+			if (response == NULL) {
+				//FIXME output error
+				swift_uri_acquire_free(message);
+				continue;
+			}
 			if (response->response_code == 304) {
 				swift_not_modified(message);
 				swift_uri_acquire_free(message);

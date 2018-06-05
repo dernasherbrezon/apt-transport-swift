@@ -4,13 +4,14 @@
 
 #include "../src/SwiftClient.h"
 #include "../src/Configuration.h"
+#include "../src/URIAcquire.h"
 
 int main(int argc, char **argv) {
 	if (argc < 4) {
 		printf("expected: url login password\n");
 		return 1;
 	}
-	char *containerName = "container";
+	char *containerName = "test";
 	struct ContainerConfiguration* containerConfig = malloc(sizeof(struct ContainerConfiguration));
 	containerConfig->container = strdup(containerName);
 	containerConfig->id = strdup("0");
@@ -46,8 +47,27 @@ int main(int argc, char **argv) {
 	printf("token: %s\n", client->token);
 	printf("endpoint: %s\n", client->endpointUrl);
 
+	struct URIAcquire* message = malloc(sizeof(struct URIAcquire));
+	if (message == NULL) {
+		return 1;
+	}
+
+	message->container = NULL;
+	message->uri = NULL;
+	message->path = strdup("/test");
+	message->filename = strdup("test");
+	message->lastModified = NULL;
+
+	struct SwiftResponse* downloadResponse = swift_client_download(client, message);
+	if( downloadResponse != NULL ) {
+		printf("code: %ld", downloadResponse->response_code);
+		printf("message: %s", downloadResponse->response_message);
+	}
+
+	swift_uri_acquire_free(message);
 	swift_configuration_free(config);
 	swift_client_clients_free(clients);
+	swift_client_response_free(downloadResponse);
 
 	return EXIT_SUCCESS;
 }
