@@ -115,12 +115,13 @@ const char * swift_client_authenticate(struct SwiftClient* client, struct Contai
 	headers = curl_slist_append(headers, "Expect:");
 
 	const char *template = "{\"auth\":{\"identity\":{\"methods\":[\"password\"],\"password\":{\"user\":{\"name\": \"%s\",\"domain\":{\"name\":\"Default\"},\"password\":\"%s\"}}}}}";
-	size_t requestLength = strlen(template) + strlen(configuration->username) + strlen(configuration->password);
+	//4 - is for 2 %s
+	size_t requestLength = (strlen(template) - 4) + strlen(configuration->username) + strlen(configuration->password);
 	char *requestBody = malloc(sizeof(char) * (requestLength + 1));
 	if (requestBody == NULL) {
 		return "unable to allocate body";
 	}
-	int allocatedBytes = snprintf(requestBody, requestLength, template, configuration->username, configuration->password);
+	int allocatedBytes = snprintf(requestBody, requestLength + 1, template, configuration->username, configuration->password);
 	requestBody[requestLength] = '\0';
 
 	curl_easy_setopt(client->curl, CURLOPT_HTTPHEADER, headers);
@@ -182,17 +183,17 @@ struct SwiftResponse* swift_client_download(struct SwiftClient *client, struct U
 		return result;
 	}
 
-	size_t length = (strlen(client->endpointUrl) + strlen(message->path));
-	char *requestUrl = malloc(length + 1);
+	const char *template = "%s/%s%s";
+	//1 is for / in template
+	size_t requestLength = (strlen(client->endpointUrl) + 1 + strlen(client->container) + strlen(message->path));
+	char *requestUrl = malloc(sizeof(char) * (requestLength + 1));
 	if (requestUrl == NULL) {
 		result->response_code = 503;
 		result->response_message = strdup("unable to allocate memory");
 		return result;
 	}
-	strncpy(requestUrl, client->endpointUrl, strlen(client->endpointUrl));
-	requestUrl[strlen(client->endpointUrl)] = '\0';
-	strcat(requestUrl, message->path);
-	requestUrl[length] = '\0';
+	int allocatedBytes = snprintf(requestUrl, requestLength + 1, template, client->endpointUrl, client->container, message->path);
+	requestUrl[requestLength] = '\0';
 
 	curl_easy_setopt(client->curl, CURLOPT_URL, requestUrl);
 
@@ -245,10 +246,11 @@ struct SwiftResponse* swift_client_download(struct SwiftClient *client, struct U
 		long response_code;
 		curl_easy_getinfo(client->curl, CURLINFO_RESPONSE_CODE, &response_code);
 		result->response_code = response_code;
+		result->response_message = NULL;
 	}
 	free(token);
 	free(lastModifiedHeader);
-	return NULL;
+	return result;
 }
 
 bool swift_client_push_back(struct SwiftClients **fubar, struct SwiftClient* value) {
