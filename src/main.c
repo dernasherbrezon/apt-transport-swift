@@ -41,6 +41,11 @@ void swift_responseStatus(const char* uri, const char* message) {
 	fprintf(stdout, "Message: %s\n", message);
 }
 
+void swift_responseGeneralFailure(char *message) {
+	fprintf(stdout, "401 General Failure\n");
+	fprintf(stdout, "Message: %s\n", message);
+}
+
 void swift_response(const struct URIAcquire* request, const struct Hashes* hashes) {
 	fprintf(stdout, "201 URI Done\n");
 	fprintf(stdout, "URI: %s\n", request->uri);
@@ -81,46 +86,50 @@ int main(void) {
 		if (startsWith(line, "601")) {
 			configuration = swift_configuration_read(stdin);
 			if (configuration == NULL) {
-				//unable to parse configuration. this is critical
-				//FIXME output error into stdout
-				break;
+				swift_responseGeneralFailure("unable to read configuration");
 			}
 			continue;
 		}
 		if (startsWith(line, "600")) {
 			struct URIAcquire* message = swift_uri_acquire_read(stdin);
 			if (message == NULL || configuration == NULL) {
-				//FIXME output error into stdout
+				swift_responseGeneralFailure("unable to read URI acquire");
 				continue;
 			}
 			if (clients == NULL) {
 				curl_global_init(CURL_GLOBAL_DEFAULT);
 			}
-			struct SwiftClient *client = swift_client_find(&clients, message->container);
+			struct SwiftClient *client = NULL;
+			if (clients != NULL) {
+				client = swift_client_find(&clients, message->container);
+			}
 			if (client == NULL) {
+				swift_responseStatus(message->uri, "connecting...");
 				client = swift_client_create(&clients, message->container, configuration);
 				if (client == NULL) {
+					swift_responseError(message->uri, "unable to connect");
 					swift_uri_acquire_free(message);
-					//FIXME output error into stdout
-					break;
+					continue;
 				}
 				struct ContainerConfiguration *containerConfig = swift_configuration_find_by_container(configuration, message->container);
 				if (containerConfig == NULL) {
+					swift_responseError(message->uri, "unable to find configuration");
 					swift_uri_acquire_free(message);
-					//FIXME output error
 					continue;
 				}
+				swift_responseStatus(message->uri, "authenticating...");
 				const char *errorResponse = swift_client_authenticate(client, containerConfig);
 				if (errorResponse != NULL) {
+					swift_responseError(message->uri, "unable to authenticate");
 					swift_uri_acquire_free(message);
-					//FIXME output error into stdout
-					break;
+					continue;
 				}
 			}
 
+			swift_responseStatus(message->uri, "downloading...");
 			struct SwiftResponse *response = swift_client_download(client, message);
 			if (response == NULL) {
-				//FIXME output error
+				swift_responseError(message->uri, "unable to download");
 				swift_uri_acquire_free(message);
 				continue;
 			}

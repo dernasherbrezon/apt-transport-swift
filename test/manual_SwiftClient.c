@@ -11,7 +11,7 @@ int main(int argc, char **argv) {
 		printf("expected: url login password\n");
 		return 1;
 	}
-	char *containerName = "test";
+	char *containerName = "stopcrawl";
 	struct ContainerConfiguration* containerConfig = malloc(sizeof(struct ContainerConfiguration));
 	containerConfig->container = strdup(containerName);
 	containerConfig->id = strdup("0");
@@ -38,7 +38,8 @@ int main(int argc, char **argv) {
 	config->containers->value[0] = containerConfig;
 
 	struct SwiftClients *clients = NULL;
-	struct SwiftClient *client = swift_client_create(&clients, containerName, config);
+	struct SwiftClient *client = NULL;
+	client = swift_client_create(&clients, containerName, config);
 	const char *response = swift_client_authenticate(client, containerConfig);
 	if (response != NULL) {
 		printf("result: %s\n", response);
@@ -54,15 +55,15 @@ int main(int argc, char **argv) {
 
 	message->container = NULL;
 	message->uri = NULL;
-	message->path = strdup("/test");
+	message->path = strdup("/1/crawlers/crawlers.ser");
 	message->filename = strdup("test");
-	message->lastModified = NULL;
-	//message->lastModified = strdup("Thu, 15 Sep 2018 19:38:00 GMT"); //arbitary future date
+	//message->lastModified = NULL;
+	message->lastModified = strdup("Thu, 15 Sep 2016 00:00:02 GMT"); //arbitary future date
 
 	struct SwiftResponse* downloadResponse = swift_client_download(client, message);
-	if( downloadResponse != NULL ) {
-		printf("code: %ld", downloadResponse->response_code);
-		printf("message: %s", downloadResponse->response_message);
+	if (downloadResponse != NULL) {
+		printf("code: %ld\n", downloadResponse->response_code);
+		printf("message: %s\n", downloadResponse->response_message);
 	}
 
 	swift_uri_acquire_free(message);
