@@ -248,6 +248,8 @@ struct SwiftResponse* swift_client_download(struct SwiftClient *client, struct U
 		result->response_code = response_code;
 		result->response_message = NULL;
 	}
+	curl_slist_free_all(headers);
+	free(requestUrl);
 	free(token);
 	free(lastModifiedHeader);
 	return result;
