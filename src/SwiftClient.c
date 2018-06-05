@@ -1,4 +1,8 @@
+#if !defined(_POSIX_C_SOURCE)
+#define _POSIX_C_SOURCE 201410L
+#endif
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include "SwiftClient.h"
 
@@ -31,20 +35,29 @@ static size_t swift_client_read_auth_request(void *dest, size_t size, size_t nme
 
 const char * swift_client_authenticate(struct SwiftClient* client, struct ContainerConfiguration *configuration) {
 	const char *path = "/v3/auth/tokens";
-	char *authUrl = malloc(sizeof(char) * (strlen(configuration->url) + strlen(path)));
+	size_t length = (strlen(configuration->url) + strlen(path));
+	char *authUrl = malloc(length + 1);
+	if( authUrl == NULL ) {
+		return "unable to allocate memory";
+	}
 	strncpy(authUrl, configuration->url, strlen(configuration->url));
 	strcat(authUrl, path);
+	authUrl[length] = '\0';
+
 	curl_easy_setopt(client->curl, CURLOPT_URL, authUrl);
 
 	struct curl_slist *headers;
 	headers = curl_slist_append(headers, "Content-Type: application/json");
 	headers = curl_slist_append(headers, "Expect:");
 
-	char *body = NULL;
-	int allocatedBytes = asprintf(&body, "{\"auth\":{\"identity\":{\"methods\":[\"password\"],\"password\":{\"user\":{\"name\": \"%s\",\"domain\":{\"name\":\"Default\"},\"password\":\"%s\"}}}}}", configuration->username, configuration->password);
+	const char *template = "{\"auth\":{\"identity\":{\"methods\":[\"password\"],\"password\":{\"user\":{\"name\": \"%s\",\"domain\":{\"name\":\"Default\"},\"password\":\"%s\"}}}}}";
+	size_t bodyLength = strlen(template) + strlen(configuration->username) + strlen(configuration->password);
+	char *body = malloc(sizeof(char) * (bodyLength + 1));
+	int allocatedBytes = snprintf(body, bodyLength, template, configuration->username, configuration->password);
 	if (allocatedBytes < 0) {
 		return "unable to allocate body";
 	}
+	body[bodyLength] = '\0';
 
 	curl_easy_setopt(client->curl, CURLOPT_HTTPHEADER, headers);
 	curl_easy_setopt(client->curl, CURLOPT_READFUNCTION, swift_client_read_auth_request);
@@ -70,6 +83,8 @@ const char * swift_client_authenticate(struct SwiftClient* client, struct Contai
 	if (response_code != 201) {
 		return "Invalid response code";
 	}
+
+	printf("body: %s\n", response.body);
 
 	curl_slist_free_all(headers);
 	free(authUrl);
