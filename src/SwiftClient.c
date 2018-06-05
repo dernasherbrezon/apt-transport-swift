@@ -231,6 +231,10 @@ struct SwiftResponse* swift_client_download(struct SwiftClient *client, struct U
 
 	curl_easy_setopt(client->curl, CURLOPT_HTTPHEADER, headers);
 	curl_easy_setopt(client->curl, CURLOPT_WRITEDATA, pagefile);
+	curl_easy_setopt(client->curl, CURLOPT_READFUNCTION, NULL);
+	curl_easy_setopt(client->curl, CURLOPT_READDATA, NULL);
+	curl_easy_setopt(client->curl, CURLOPT_POST, 0);
+	curl_easy_setopt(client->curl, CURLOPT_WRITEFUNCTION, NULL);
 
 	CURLcode res = curl_easy_perform(client->curl);
 	fclose(pagefile);

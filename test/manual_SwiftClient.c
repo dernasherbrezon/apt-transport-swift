@@ -57,6 +57,7 @@ int main(int argc, char **argv) {
 	message->path = strdup("/test");
 	message->filename = strdup("test");
 	message->lastModified = NULL;
+	//message->lastModified = strdup("Thu, 15 Sep 2018 19:38:00 GMT"); //arbitary future date
 
 	struct SwiftResponse* downloadResponse = swift_client_download(client, message);
 	if( downloadResponse != NULL ) {
