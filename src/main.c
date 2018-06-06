@@ -166,6 +166,7 @@ int main(void) {
 
 	swift_configuration_free(configuration);
 	swift_client_clients_free(clients);
+	curl_global_cleanup();
 
 	return EXIT_SUCCESS;
 }

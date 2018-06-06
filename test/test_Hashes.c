@@ -14,6 +14,7 @@ START_TEST (test_md5Only) {
 	req.expectedSha512 = false;
 
 	struct Hashes* hashes = swift_hash_file(&req, fp);
+	fclose(fp);
 	ck_assert_str_eq(hashes->md5, "26e078b87fdaa3206ab8bf63a6096c07");
 	ck_assert(hashes->sha1 == NULL);
 	ck_assert(hashes->sha256 == NULL);
@@ -35,6 +36,7 @@ START_TEST (test_hashes) {
 	req.expectedSha512 = true;
 
 	struct Hashes* hashes = swift_hash_file(&req, fp);
+	fclose(fp);
 	ck_assert_str_eq(hashes->md5, "26e078b87fdaa3206ab8bf63a6096c07");
 	ck_assert_str_eq(hashes->sha1, "3579307d55e123bde331b3eefce08090bea3fbe7");
 	ck_assert_str_eq(hashes->sha256, "f107aac59dff1d49ebfedb7f03877eaa0297f9a7d3cff26edfc75406f222256d");

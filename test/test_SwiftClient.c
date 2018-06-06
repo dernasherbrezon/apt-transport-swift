@@ -16,6 +16,7 @@ START_TEST (test_init) {
 	ck_assert(client != NULL);
 	swift_client_clients_free(clients);
 	swift_configuration_free(config);
+	curl_global_cleanup();
 }
 END_TEST
 
