@@ -305,7 +305,6 @@ struct SwiftClient* swift_client_create(struct SwiftClients **clients, char *con
 		curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
 	}
 	curl_easy_setopt(curl, CURLOPT_USERAGENT, "apt-transport-swift");
-//	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, swift_client_write_data);
 	if (config->proxyHostPort != NULL) {
 		curl_easy_setopt(curl, CURLOPT_PROXY, config->proxyHostPort);
 	}
