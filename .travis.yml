@@ -20,8 +20,7 @@ script:
   - mkdir debug && cd debug
   - cmake -DCMAKE_BUILD_TYPE=Debug ..
   - make 
-  - ctest -T memcheck
-  - cd ..
-  - mkdir release && cd release
+  - ./run_tests.sh
+  - cd .. && mkdir release && cd release
   - cmake ..
   - make
