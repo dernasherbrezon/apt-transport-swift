@@ -1,0 +1,5 @@
+apt-transport-swift (1.0.0-1) UNRELEASED; urgency=medium
+
+  * Initial release. (Closes: #1)
+
+ -- Andrey Rodionov <dernasherbrezon@gmail.com>  Wed, 06 Jun 2018 20:17:21 +0100
