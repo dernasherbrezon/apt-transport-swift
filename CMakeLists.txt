@@ -9,6 +9,8 @@ list(REMOVE_ITEM SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/main.c")
 
 add_executable(swift src/main.c)
 
+install(TARGETS swift DESTINATION /usr/lib/apt/methods)
+
 add_library(swiftlib ${SOURCES})
 target_link_libraries(swift swiftlib)
 
