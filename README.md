@@ -29,7 +29,7 @@ Configuration should be put into /etc/apt/apt.conf.d/:
 	Swift {
 	 Container0 {
 	   Name "container";
-	   URL "https://example.com/v3";
+	   URL "https://example.com";
 	   Username "username";
 	   Password "password";
 	 };
@@ -40,13 +40,13 @@ You could configure several private containers on different hosts:
 	Swift {
 	 Container0 {
 	   Name "container";
-	   URL "https://example.com/v3";
+	   URL "https://example.com";
 	   Username "username";
 	   Password "password";
 	 };
 	 Container1 {
 	   Name "container2";
-	   URL "https://2.example.com/v3";
+	   URL "https://2.example.com";
 	   Username "username";
 	   Password "password";
 	 }; 
