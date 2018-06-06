@@ -18,13 +18,15 @@ void swift_requestCapabilities() {
 	fprintf(stdout, "100 Capabilities\n");
 	fprintf(stdout, "Version: 1.2\n");
 	fprintf(stdout, "Pipeline: false\n");
-	fprintf(stdout, "Send-Config: true\n");
+	fprintf(stdout, "Send-Config: true\n\n");
+	fflush(stdout);
 }
 
 void swift_responseError(const char* uri, const char* error) {
 	fprintf(stdout, "400 URI Failure\n");
 	fprintf(stdout, "URI: %s\n", uri);
-	fprintf(stdout, "Message: %s\n", error);
+	fprintf(stdout, "Message: %s\n\n", error);
+	fflush(stdout);
 }
 
 void swift_not_modified(const struct URIAcquire* request) {
@@ -32,18 +34,21 @@ void swift_not_modified(const struct URIAcquire* request) {
 	fprintf(stdout, "URI: %s\n", request->uri);
 	fprintf(stdout, "Filename: %s\n", request->filename);
 	fprintf(stdout, "Last-Modified: \n");
-	fprintf(stdout, "IMS-Hit: true\n");
+	fprintf(stdout, "IMS-Hit: true\n\n");
+	fflush(stdout);
 }
 
 void swift_responseStatus(const char* uri, const char* message) {
 	fprintf(stdout, "102 Status\n");
 	fprintf(stdout, "URI: %s\n", uri);
-	fprintf(stdout, "Message: %s\n", message);
+	fprintf(stdout, "Message: %s\n\n", message);
+	fflush(stdout);
 }
 
 void swift_responseGeneralFailure(char *message) {
 	fprintf(stdout, "401 General Failure\n");
-	fprintf(stdout, "Message: %s\n", message);
+	fprintf(stdout, "Message: %s\n\n", message);
+	fflush(stdout);
 }
 
 void swift_response(const struct URIAcquire* request, const struct Hashes* hashes) {
@@ -64,7 +69,8 @@ void swift_response(const struct URIAcquire* request, const struct Hashes* hashe
 	if (hashes->sha512 != NULL) {
 		fprintf(stdout, "SHA512-Hash: %s\n", hashes->sha512);
 	}
-	fprintf(stdout, "Checksum-FileSize-Hash: %llu\n", ((unsigned long long) hashes->fileSize));
+	fprintf(stdout, "Checksum-FileSize-Hash: %llu\n\n", ((unsigned long long) hashes->fileSize));
+	fflush(stdout);
 }
 
 int main(void) {
