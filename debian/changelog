@@ -1,4 +1,4 @@
-apt-transport-swift (1.0.0-1) UNRELEASED; urgency=medium
+apt-transport-swift (1.0.0-1) trusty; urgency=medium
 
   * Initial release. (Closes: #1)
 
