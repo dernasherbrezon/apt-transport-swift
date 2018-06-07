@@ -130,6 +130,10 @@ int main(void) {
 					swift_uri_acquire_free(message);
 					continue;
 				}
+			} else if (client->token == NULL || client->endpointUrl == NULL) {
+				swift_responseError(message->uri, "not authenticated");
+				swift_uri_acquire_free(message);
+				continue;
 			}
 
 			swift_responseStatus(message->uri, "downloading...");

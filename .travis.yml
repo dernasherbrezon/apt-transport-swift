@@ -8,7 +8,7 @@ addons:
   apt:
     packages:
     - libssl-dev
-    - libcurl4-gnutls-dev
+    - libcurl3-dev
     - libjson-c-dev
     - liburiparser-dev
     - valgrind
