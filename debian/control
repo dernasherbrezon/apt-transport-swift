@@ -3,7 +3,7 @@ Maintainer: Andrey Rodionov <dernasherbrezon@gmail.com>
 Section: admin
 Priority: optional
 Standards-Version: 3.9.7
-Build-Depends: debhelper (>= 9.0.0), libssl-dev, libcurl4-gnutls-dev, libjson-c-dev, liburiparser-dev, check
+Build-Depends: debhelper (>= 9.0.0), cmake, libssl-dev, libcurl4-gnutls-dev, libjson-c-dev, liburiparser-dev, check
 Homepage: https://github.com/dernasherbrezon/apt-transport-swift
 
 Package: apt-transport-swift
