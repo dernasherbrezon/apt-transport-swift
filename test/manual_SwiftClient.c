@@ -68,11 +68,19 @@ int main(int argc, char **argv) {
 		printf("code: %ld\n", downloadResponse->response_code);
 		printf("message: %s\n", downloadResponse->response_message);
 	}
+	swift_client_response_free(downloadResponse);
+
+	//second time
+	downloadResponse = swift_client_download(client, message);
+	if (downloadResponse != NULL) {
+		printf("code: %ld\n", downloadResponse->response_code);
+		printf("message: %s\n", downloadResponse->response_message);
+	}
+	swift_client_response_free(downloadResponse);
 
 	swift_uri_acquire_free(message);
 	swift_configuration_free(config);
 	swift_client_clients_free(clients);
-	swift_client_response_free(downloadResponse);
 
 	return EXIT_SUCCESS;
 }
