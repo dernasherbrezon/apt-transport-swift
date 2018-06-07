@@ -47,10 +47,20 @@ static size_t swift_client_read_auth_response(void *ptr, size_t size, size_t nme
 	return size * nmemb;
 }
 
+struct Request {
+	char *body;
+	size_t wrote;
+};
+
 static size_t swift_client_read_auth_request(void *dest, size_t size, size_t nmemb, void *userp) {
-	char *body = (char*) userp;
-	int allocatedBytes = (sizeof(char) * strlen(body));
-	memcpy(dest, body, allocatedBytes);
+	struct Request* request = (struct Request*) userp;
+	if (request->wrote != 0) {
+		//request->wrote could be boolean
+		return 0;
+	}
+	int allocatedBytes = (sizeof(char) * strlen(request->body));
+	request->wrote = allocatedBytes;
+	memcpy(dest, request->body, allocatedBytes);
 	return allocatedBytes;
 }
 
@@ -124,9 +134,13 @@ const char * swift_client_authenticate(struct SwiftClient* client, struct Contai
 	int allocatedBytes = snprintf(requestBody, requestLength + 1, template, configuration->username, configuration->password);
 	requestBody[requestLength] = '\0';
 
+	struct Request request;
+	request.body = requestBody;
+	request.wrote = 0;
+
 	curl_easy_setopt(client->curl, CURLOPT_HTTPHEADER, headers);
 	curl_easy_setopt(client->curl, CURLOPT_READFUNCTION, swift_client_read_auth_request);
-	curl_easy_setopt(client->curl, CURLOPT_READDATA, requestBody);
+	curl_easy_setopt(client->curl, CURLOPT_READDATA, &request);
 	curl_easy_setopt(client->curl, CURLOPT_POSTFIELDSIZE, allocatedBytes);
 	curl_easy_setopt(client->curl, CURLOPT_POST, 1);
 
