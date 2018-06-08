@@ -60,10 +60,6 @@ struct URIAcquire* swift_uri_acquire_read(FILE *source) {
 	}
 	result->lastModified = NULL;
 	result->container = NULL;
-	result->expectedMd5 = false;
-	result->expectedSha1 = false;
-	result->expectedSha256 = false;
-	result->expectedSha512 = false;
 	while (true) {
 		free(line);
 		line = NULL;
@@ -87,15 +83,6 @@ struct URIAcquire* swift_uri_acquire_read(FILE *source) {
 		if (lastModified != NULL) {
 			result->lastModified = lastModified;
 			continue;
-		}
-		if (startsWith(line, "Expected-MD5Sum")) {
-			result->expectedMd5 = true;
-		} else if (startsWith(line, "Expected-SHA1")) {
-			result->expectedSha1 = true;
-		} else if (startsWith(line, "Expected-SHA256")) {
-			result->expectedSha256 = true;
-		} else if (startsWith(line, "Expected-SHA512")) {
-			result->expectedSha512 = true;
 		}
 	}
 

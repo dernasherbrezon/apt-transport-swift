@@ -2,38 +2,12 @@
 #include <check.h>
 #include "../src/Hashes.h"
 
-START_TEST (test_md5Only) {
-	FILE *fp;
-	fp = fopen("file-for-hashes.txt", "r");
-	ck_assert(fp != NULL);
-
-	struct URIAcquire req;
-	req.expectedMd5 = true;
-	req.expectedSha1 = false;
-	req.expectedSha256 = false;
-	req.expectedSha512 = false;
-
-	struct Hashes* hashes = swift_hash_file(&req, fp);
-	fclose(fp);
-	ck_assert_str_eq(hashes->md5, "26e078b87fdaa3206ab8bf63a6096c07");
-	ck_assert(hashes->sha1 == NULL);
-	ck_assert(hashes->sha256 == NULL);
-	ck_assert(hashes->sha512 == NULL);
-	ck_assert_int_eq(hashes->fileSize, 11);
-	swift_hash_file_free(hashes);
-}
-END_TEST
-
 START_TEST (test_hashes) {
 	FILE *fp;
 	fp = fopen("file-for-hashes.txt", "r");
 	ck_assert(fp != NULL);
 
 	struct URIAcquire req;
-	req.expectedMd5 = true;
-	req.expectedSha1 = true;
-	req.expectedSha256 = true;
-	req.expectedSha512 = true;
 
 	struct Hashes* hashes = swift_hash_file(&req, fp);
 	fclose(fp);
@@ -56,7 +30,6 @@ Suite * common_suite(void) {
 	tc_core = tcase_create("Core");
 
 	tcase_add_test(tc_core, test_hashes);
-	tcase_add_test(tc_core, test_md5Only);
 	suite_add_tcase(s, tc_core);
 
 	return s;

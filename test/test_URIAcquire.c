@@ -10,10 +10,6 @@ START_TEST (test_readmessage) {
 	struct URIAcquire* message = swift_uri_acquire_read(fp);
 	fclose(fp);
 	ck_assert(message != NULL);
-	ck_assert(message->expectedMd5 == false);
-	ck_assert(message->expectedSha1 == true);
-	ck_assert(message->expectedSha256 == false);
-	ck_assert(message->expectedSha512 == false);
 	ck_assert_str_eq(message->filename, "dists_stretch_InRelease");
 	ck_assert_str_eq(message->uri, "swift://container/dists/stretch/InRelease");
 	ck_assert_str_eq(message->container, "container");

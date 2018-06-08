@@ -10,10 +10,6 @@ struct URIAcquire {
 	char *path;
 
 	char *filename;
-	bool expectedMd5;
-	bool expectedSha1;
-	bool expectedSha256;
-	bool expectedSha512;
 	char *lastModified;
 };
 
