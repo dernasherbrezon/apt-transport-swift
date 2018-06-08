@@ -5,6 +5,13 @@ Additional "swift" protocol for apt so you can host your giant apt repository in
 
 apt is a great packaging system and Openstack swift is a great place to backup/store static files.  apt-swift is especially useful and fast if you are hosting your servers within Openstack.
 
+Installation
+=================
+
+	sudo add-apt-repository ppa:rodionovamp/apt-transport-swift
+	sudo apt-get update
+
+
 Compile
 =======
 
