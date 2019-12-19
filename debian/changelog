@@ -1,3 +1,9 @@
+apt-transport-swift (1.0.4-2) bionic; urgency=medium
+
+  * Build for bionic
+
+ -- Andrey Rodionov <dernasherbrezon@gmail.com>  Wed, 19 Dec 2019 15:11:21 +0100
+
 apt-transport-swift (1.0.4-1) trusty; urgency=medium
 
   * Always generate all hashes
