@@ -10,6 +10,7 @@ Installation
 
 	sudo add-apt-repository ppa:rodionovamp/apt-transport-swift
 	sudo apt-get update
+	sudo apt-get install apt-transport-swift
 
 
 Compile
