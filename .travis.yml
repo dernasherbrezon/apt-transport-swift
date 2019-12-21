@@ -5,6 +5,12 @@ compiler:
   - gcc
 
 addons:
+  sonarcloud:
+    organization: "dernasherbrezon-github"
+    token:
+      secure: "maYNDLzzRiU9n2h5aWLLhvT1Odo1hjhH8zvVLEhUou0osVtB9asxn4VoDGJwx0eAx+CtXwNXKc/oCI1ih+rwE/g8upeRDpbEd0s7Y/bwxNogcIEYkCd9n+6m+pEO9kUJ3cKSjkn/HjToJ8C7mgexQbKXTN+PTNZe3q4RfYCU//tIAWGadUhjEzcgB0CBM5T+KN+C8nEoV5JAjvb9Nj/kaiTuRjGBMLyvxQkfebt07w7p8Exk6Wail5OThhfkYeDO87C5xsMLzT/OFppUoyESrKAaGcjQ0uVhiBYP7mHEs6bRwoUoqRSxZxk9b+HSItav4R0qe9mxTyeQKsre9hizD6LFM2q9M/Xsu9jJs8v+ivnlUfAgMNOxwu975WeDDFVh9PPWsuooYh3ch5EwFVx6FF+AWsdvFGq0J0oEt2GZXQdLIDcnVgYt9LTkx8k2jHUv3zn3h2V/qbw/wSh5cYED2VmnDtPYfDIMKxP2tB3TgeNLTzkzKI1fG1b/6iBo5TnwpVaVVU0DSve8SNxNgKjzW+0d8wEQa7/3sRCJMyeMuNXJ+KbD4XQqgscVAQS/8SVIR6BFfwX+GTD+dxAkTMdkbvNfkHRlYP76uN2cLo6DQo7lE3yo7tykm+Av4DYPwWTI44SNhSgs+WWtADvEi6WicqoRk39j4n0adW/KdxO4i4c="
+
+addons:
   apt:
     packages:
     - libssl-dev
@@ -20,8 +26,9 @@ script:
   - set -e
   - mkdir debug && cd debug
   - cmake -DCMAKE_BUILD_TYPE=Debug ..
-  - make 
+  - build-wrapper-linux-x86-64 --out-dir bw-output make all
   - ./run_tests.sh
+  - sonar-scanner
   - cd .. && mkdir release && cd release
   - cmake ..
   - make

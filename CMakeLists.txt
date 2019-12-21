@@ -3,7 +3,9 @@ project(apt-transport-swift)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 set(CMAKE_C_FLAGS "-std=c99")
-
+if(CMAKE_BUILD_TYPE MATCHES Debug)
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fprofile-arcs -ftest-coverage")
+endif()
 file(GLOB SOURCES src/*.c)
 list(REMOVE_ITEM SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/main.c")
 
@@ -63,3 +65,8 @@ foreach(curTest ${MANUAL_TEST_SOURCES})
 	endif()
 	target_link_libraries(${curTestName} swiftlib ${CMAKE_THREAD_LIBS_INIT} ${CURL_LIBRARIES} ${OPENSSL_SSL_LIBRARY} ${OPENSSL_CRYPTO_LIBRARY} ${JSON-C_LIBRARIES} ${URIPARSER_LIBRARY})
 endforeach()
+
+if(CMAKE_BUILD_TYPE MATCHES Debug)
+	add_custom_target("coverage")
+	add_custom_command(TARGET "coverage" COMMAND gcov -o ${CMAKE_BINARY_DIR}/CMakeFiles/swiftlib.dir/src/*.c.o)
+endif()
