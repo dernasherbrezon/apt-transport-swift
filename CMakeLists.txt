@@ -68,5 +68,5 @@ endforeach()
 
 if(CMAKE_BUILD_TYPE MATCHES Debug)
 	add_custom_target("coverage")
-	add_custom_command(TARGET "coverage" COMMAND gcov -o ${CMAKE_BINARY_DIR}/CMakeFiles/swiftlib.dir/src/*.c.o)
+	add_custom_command(TARGET "coverage" COMMAND gcov ${CMAKE_BINARY_DIR}/CMakeFiles/swiftlib.dir/src/*.c.o)
 endif()
