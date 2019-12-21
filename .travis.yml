@@ -21,12 +21,14 @@ addons:
     - check
     - make
     - cmake
+    - gcov
+    - pkg-config
 
 script:
   - set -e
   - mkdir debug && cd debug
   - cmake -DCMAKE_BUILD_TYPE=Debug ..
-  - build-wrapper-linux-x86-64 --out-dir bw-output make all
+  - build-wrapper --out-dir bw-output make all
   - ./run_tests.sh
   - sonar-scanner
   - cd .. && mkdir release && cd release
