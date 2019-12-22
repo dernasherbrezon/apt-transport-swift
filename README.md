@@ -1,4 +1,4 @@
-About
+About [![Build Status](https://travis-ci.org/dernasherbrezon/apt-transport-swift.svg?branch=master)](https://travis-ci.org/dernasherbrezon/apt-transport-swift) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=dernasherbrezon_apt-transport-swift&metric=alert_status)](https://sonarcloud.io/dashboard?id=dernasherbrezon_apt-transport-swift)
 =======
 
 Additional "swift" protocol for apt so you can host your giant apt repository in Openstack swift
