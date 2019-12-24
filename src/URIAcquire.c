@@ -60,6 +60,9 @@ struct URIAcquire* swift_uri_acquire_read(FILE *source) {
 	}
 	result->lastModified = NULL;
 	result->container = NULL;
+	result->uri = NULL;
+	result->path = NULL;
+	result->filename = NULL;
 	while (true) {
 		free(line);
 		line = NULL;
