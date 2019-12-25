@@ -32,6 +32,7 @@ START_TEST (test_trim) {
 	assertTrim(" ", "");
 	assertTrim("a", "a");
 	assertTrim("\0", "");
+	assertTrim("", "");
 	ck_assert(trim(NULL) == NULL);
 }
 END_TEST
