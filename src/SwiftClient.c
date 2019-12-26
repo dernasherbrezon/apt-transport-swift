@@ -190,13 +190,6 @@ struct SwiftResponse* swift_client_download(struct SwiftClient *client, struct U
 		return NULL;
 	}
 
-	FILE *pagefile = fopen(message->filename, "wb");
-	if (!pagefile) {
-		result->response_code = 503;
-		result->response_message = strdup("unable to open file for write");
-		return result;
-	}
-
 	const char *template = "%s/%s%s";
 	//1 is for / in template
 	size_t requestLength = (strlen(client->endpointUrl) + 1 + strlen(client->container) + strlen(message->path));
@@ -242,6 +235,13 @@ struct SwiftResponse* swift_client_download(struct SwiftClient *client, struct U
 		lastModified[lastModifiedHeaderLength] = '\0';
 
 		headers = curl_slist_append(headers, lastModified);
+	}
+
+	FILE *pagefile = fopen(message->filename, "wb");
+	if (!pagefile) {
+		result->response_code = 503;
+		result->response_message = strdup("unable to open file for write");
+		return result;
 	}
 
 	curl_easy_setopt(client->curl, CURLOPT_HTTPHEADER, headers);
