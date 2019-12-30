@@ -28,4 +28,4 @@ script:
   - if [[ $TRAVIS_COMPILER == 'gcc' ]]; then sh ./build_debug.sh; fi
   - mkdir release && cd release
   - cmake ..
-  - make VERBOSE=1
+  - make
