@@ -2,7 +2,7 @@
 #  Once done this will define
 #
 #  CHECK_FOUND - system has check
-#  CHECK_INCLUDE_DIR - the check include directory
+#  CHECK_INCLUDE_DIRS - the check include directory
 #  CHECK_LIBRARIES - check library
 #
 #  This configuration file for finding libcheck is originally from
@@ -19,12 +19,13 @@
 find_package(PkgConfig)
 pkg_check_modules(PC_CHECK QUIET check)
 
-find_path(CHECK_INCLUDE_DIR NAMES json-c/json.h)
+find_path(CHECK_INCLUDE_DIR NAMES check.h)
 
-find_library(CHECK_LIBRARY NAMES check libcheck
+find_library(CHECK_LIBRARY NAMES check
 	HINTS ${PC_CHECK_LIBDIR} ${PC_CHECK_LIBRARY_DIRS})
 
 set(CHECK_LIBRARIES ${CHECK_LIBRARY})
+set(CHECK_INCLUDE_DIRS ${CHECK_INCLUDE_DIR})
 
 include(FindPackageHandleStandardArgs)
 
