@@ -53,7 +53,7 @@ foreach(curTest ${TEST_SOURCES})
 		target_link_libraries(${curTestName} rt)
 	endif()
 	target_link_libraries(${curTestName} m)
-	target_link_libraries(${curTestName} swiftlib ${CMAKE_THREAD_LIBS_INIT} ${CURL_LIBRARIES} ${OPENSSL_SSL_LIBRARY} ${OPENSSL_CRYPTO_LIBRARY} ${JSON-C_LIBRARIES} ${URIPARSER_LIBRARY} ${CHECK_LIBRARIES})
+	target_link_libraries(${curTestName} swiftlib ${CMAKE_THREAD_LIBS_INIT} ${CURL_LIBRARIES} ${OPENSSL_SSL_LIBRARY} ${OPENSSL_CRYPTO_LIBRARY} ${JSON-C_LIBRARIES} ${URIPARSER_LIBRARY} ${PC_CHECK_LDFLAGS})
 endforeach()
 
 file(GLOB MANUAL_TEST_SOURCES test/manual_*.c)
