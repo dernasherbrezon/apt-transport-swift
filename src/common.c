@@ -62,7 +62,8 @@ char* concat(const char* str1, const char* str2) {
 	if( result == NULL ) {
 		return NULL;
 	}
-	strcpy(result, str1);
-	strcat(result, str2);
+	strncpy(result, str1, strlen(str1));
+	result[strlen(str1)] = '\0';
+	strncat(result, str2, strlen(str2));
 	return result;
 }

@@ -38,7 +38,7 @@ START_TEST (test_trim) {
 END_TEST
 
 START_TEST (test_concat) {
-	const char* actual = concat("api.example.com", "/v3/auth/tokens");
+	void* actual = concat("api.example.com", "/v3/auth/tokens");
 	ck_assert_str_eq("api.example.com/v3/auth/tokens", actual);
 	free(actual);
 }
