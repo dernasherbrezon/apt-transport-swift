@@ -107,17 +107,10 @@ char* swift_client_extract_endpoint(char *body) {
 }
 
 const char * swift_client_authenticate(struct SwiftClient* client, struct ContainerConfiguration *configuration) {
-	const char *path = "/v3/auth/tokens";
-	size_t length = (strlen(configuration->url) + strlen(path));
-	char *authUrl = malloc(length + 1);
+	char *authUrl = concat(configuration->url, "/v3/auth/tokens");
 	if (authUrl == NULL) {
 		return "unable to allocate memory";
 	}
-	strncpy(authUrl, configuration->url, strlen(configuration->url));
-	authUrl[strlen(configuration->url)] = '\0';
-	strcat(authUrl, path);
-	authUrl[length] = '\0';
-
 	curl_easy_setopt(client->curl, CURLOPT_URL, authUrl);
 
 	struct curl_slist *headers = NULL;
@@ -204,36 +197,23 @@ struct SwiftResponse* swift_client_download(struct SwiftClient *client, struct U
 
 	curl_easy_setopt(client->curl, CURLOPT_URL, requestUrl);
 
-	const char *tokenHeader = "X-Auth-Token: ";
-	size_t tokenHeaderLength = strlen(tokenHeader) + strlen(client->token);
-	char *token = malloc(tokenHeaderLength + 1);
+	char *token = concat("X-Auth-Token: ", client->token);
 	if (token == NULL) {
 		result->response_code = 503;
 		result->response_message = strdup("unable to allocate memory");
 		return result;
 	}
-	strncpy(token, tokenHeader, strlen(tokenHeader));
-	token[strlen(tokenHeader)] = '\0';
-	strcat(token, client->token);
-	token[tokenHeaderLength] = '\0';
 	struct curl_slist *headers = NULL;
 	headers = curl_slist_append(headers, token);
 
-	char *lastModifiedHeader = NULL;
+	char *lastModified = NULL;
 	if (message->lastModified != NULL) {
-		const char *lastModifiedHeader = "If-Modified-Since: ";
-		size_t lastModifiedHeaderLength = strlen(lastModifiedHeader) + strlen(message->lastModified);
-		char *lastModified = malloc(lastModifiedHeaderLength + 1);
+		lastModified = concat("If-Modified-Since: ", message->lastModified);
 		if (lastModified == NULL) {
 			result->response_code = 503;
 			result->response_message = strdup("unable to allocate memory");
 			return result;
 		}
-		strncpy(lastModified, lastModifiedHeader, strlen(lastModifiedHeader));
-		lastModified[strlen(lastModifiedHeader)] = '\0';
-		strcat(lastModified, message->lastModified);
-		lastModified[lastModifiedHeaderLength] = '\0';
-
 		headers = curl_slist_append(headers, lastModified);
 	}
 
@@ -265,7 +245,7 @@ struct SwiftResponse* swift_client_download(struct SwiftClient *client, struct U
 	curl_slist_free_all(headers);
 	free(requestUrl);
 	free(token);
-	free(lastModifiedHeader);
+	free(lastModified);
 	return result;
 }
 

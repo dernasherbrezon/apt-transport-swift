@@ -8,6 +8,8 @@ bool startsWith(const char *str, const char *pre);
 
 char* cutPrefix(const char* str, const char* prefix);
 
-char *trim(char *str);
+char* trim(char *str);
+
+char* concat(const char* str1, const char* str2);
 
 #endif /* COMMON_H_ */

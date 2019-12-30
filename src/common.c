@@ -56,3 +56,13 @@ char *trim(char *str) {
 
 	return str;
 }
+
+char* concat(const char* str1, const char* str2) {
+	char *result = malloc(strlen(str1) + strlen(str2) + 1);
+	if( result == NULL ) {
+		return NULL;
+	}
+	strcpy(result, str1);
+	strcat(result, str2);
+	return result;
+}

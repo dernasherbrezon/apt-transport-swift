@@ -37,6 +37,11 @@ START_TEST (test_trim) {
 }
 END_TEST
 
+START_TEST (test_concat) {
+	ck_assert_str_eq("api.example.com/v3/auth/tokens", concat("api.example.com", "/v3/auth/tokens"));
+}
+END_TEST
+
 Suite * common_suite(void) {
 	Suite *s;
 	TCase *tc_core;
@@ -49,6 +54,7 @@ Suite * common_suite(void) {
 	tcase_add_test(tc_core, test_cutPrefix);
 	tcase_add_test(tc_core, test_startsWith);
 	tcase_add_test(tc_core, test_trim);
+	tcase_add_test(tc_core, test_concat);
 	suite_add_tcase(s, tc_core);
 
 	return s;
