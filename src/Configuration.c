@@ -75,8 +75,8 @@ struct Configuration* swift_configuration_read(FILE* source) {
 		}
 		char *container = cutPrefix(line, "Config-Item: Swift::Container");
 		if (container != NULL) {
-			char *pch;
-			pch = strtok(container, ":");
+			char *pointer;
+			char *pch = strtok_r(container, ":", &pointer);
 			if (pch == NULL) {
 				fprintf(stderr, "invalid format: %s\n", container);
 				free(container);
@@ -99,13 +99,13 @@ struct Configuration* swift_configuration_read(FILE* source) {
 					break;
 				}
 			}
-			pch = strtok(NULL, "=");
+			pch = strtok_r(NULL, "=", &pointer);
 			if (pch == NULL) {
 				fprintf(stderr, "invalid format: %s\n", container);
 				free(container);
 				continue;
 			}
-			char *value = strdup(strtok(NULL, "="));
+			char *value = strdup(strtok_r(NULL, "=", &pointer));
 			if (value == NULL) {
 				fprintf(stderr, "invalid format: %s\n", container);
 				free(container);
