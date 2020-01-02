@@ -159,7 +159,12 @@ int main(void) {
 			swift_client_response_free(response);
 
 			FILE *pagefile = fopen(message->filename, "rb");
-			struct Hashes* hashes = swift_hash_file(message, pagefile);
+			if (!pagefile) {
+				swift_responseError(message->uri, "unable to open file");
+				swift_uri_acquire_free(message);
+				continue;
+			}
+			struct Hashes* hashes = swift_hash_file(pagefile);
 			fclose(pagefile);
 			if (hashes == NULL) {
 				swift_uri_acquire_free(message);

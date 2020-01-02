@@ -9,7 +9,7 @@
 
 #include "Hashes.h"
 
-char* swift_convertToHexString(unsigned char* str, int arraySize) {
+char* swift_convertToHexString(const unsigned char* str, int arraySize) {
 	char* result = malloc(sizeof(char) * (arraySize * 2 + 1));
 	for (int i = 0; i < arraySize; i++) {
 		sprintf(&result[i * 2], "%02x", str[i]);
@@ -18,7 +18,7 @@ char* swift_convertToHexString(unsigned char* str, int arraySize) {
 	return result;
 }
 
-struct Hashes* swift_hash_file(struct URIAcquire* req, FILE* file) {
+struct Hashes* swift_hash_file(FILE* file) {
 	if (file == NULL) {
 		return NULL;
 	}

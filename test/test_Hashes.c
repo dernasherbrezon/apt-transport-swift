@@ -7,9 +7,7 @@ START_TEST (test_hashes) {
 	fp = fopen("file-for-hashes.txt", "r");
 	ck_assert(fp != NULL);
 
-	struct URIAcquire req;
-
-	struct Hashes* hashes = swift_hash_file(&req, fp);
+	struct Hashes* hashes = swift_hash_file(fp);
 	fclose(fp);
 	ck_assert_str_eq(hashes->md5, "26e078b87fdaa3206ab8bf63a6096c07");
 	ck_assert_str_eq(hashes->sha1, "3579307d55e123bde331b3eefce08090bea3fbe7");

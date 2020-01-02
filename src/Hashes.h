@@ -14,7 +14,7 @@ struct Hashes {
 	off_t fileSize;
 };
 
-struct Hashes* swift_hash_file(struct URIAcquire* req, FILE* file);
+struct Hashes* swift_hash_file(FILE* file);
 
 void swift_hash_file_free(struct Hashes* obj);
 
