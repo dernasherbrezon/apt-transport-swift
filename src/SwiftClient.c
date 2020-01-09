@@ -183,7 +183,6 @@ struct SwiftResponse* swift_client_download(struct SwiftClient *client, struct U
 		return NULL;
 	}
 
-	const char *template = "%s/%s%s";
 	//1 is for / in template
 	size_t requestLength = (strlen(client->endpointUrl) + 1 + strlen(client->container) + strlen(message->path));
 	char *requestUrl = malloc(sizeof(char) * (requestLength + 1));
@@ -192,7 +191,7 @@ struct SwiftResponse* swift_client_download(struct SwiftClient *client, struct U
 		result->response_message = strdup("unable to allocate memory");
 		return result;
 	}
-	int allocatedBytes = snprintf(requestUrl, requestLength + 1, template, client->endpointUrl, client->container, message->path);
+	snprintf(requestUrl, requestLength + 1, "%s/%s%s", client->endpointUrl, client->container, message->path);
 	requestUrl[requestLength] = '\0';
 
 	curl_easy_setopt(client->curl, CURLOPT_URL, requestUrl);
